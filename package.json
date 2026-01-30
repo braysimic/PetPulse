@@ -1,0 +1,30 @@
+{
+  "name": "petpulse",
+  "version": "1.0.0",
+  "description": "Comprehensive Pet Health &amp; History",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/braysimic/PetPulse.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/braysimic/PetPulse/issues"
+  },
+  "homepage": "https://github.com/braysimic/PetPulse#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
