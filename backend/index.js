@@ -9,8 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 // ===== MongoDB connection =====
-// Make sure your .env has MONGO_URI like:
-// MONGO_URI=mongodb+srv://SDDcapstone:SDDcapstone%231@cluster0.abcd1.mongodb.net/petpulse?retryWrites=true&w=majority
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected!'))
