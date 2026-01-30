@@ -1,6 +1,5 @@
 node_modules/
 .env
-backend/serviceAccountKey.json
 .DS_Store
 
 # Logs

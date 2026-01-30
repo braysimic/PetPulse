@@ -1,57 +1,97 @@
+// index.js
 const express = require('express');
 const cors = require('cors');
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===== Firebase Admin SDK setup =====
-const serviceAccount = {
-  type: 'service_account',
-  project_id: process.env.FIREBASE_PROJECT_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-  client_email: process.env.FIREBASE_CLIENT_EMAIL
-};
+// ===== MongoDB connection =====
+// Make sure your .env has MONGO_URI like:
+// MONGO_URI=mongodb+srv://SDDcapstone:SDDcapstone%231@cluster0.abcd1.mongodb.net/petpulse?retryWrites=true&w=majority
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected!'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+// ===== Pet Schema & Model =====
+const petSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  species: { type: String, required: true },
+  age: { type: Number, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-const db = admin.firestore();
+const Pet = mongoose.model('Pet', petSchema);
 
-// ===== Example routes =====
+// ===== Routes =====
 app.get('/api/status', (req, res) => {
   res.send({ status: 'PetPulse API is running!' });
 });
 
-// Example: add a test pet
+// Add a new pet
 app.post('/api/pets', async (req, res) => {
   try {
     const { name, species, age } = req.body;
-    const docRef = await db.collection('pets').add({ name, species, age, createdAt: new Date() });
-    res.send({ message: 'Pet added!', id: docRef.id });
+    const pet = new Pet({ name, species, age });
+    await pet.save();
+    res.send({ message: 'Pet added!', id: pet._id });
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
-// Example: list all pets
+// List all pets
 app.get('/api/pets', async (req, res) => {
   try {
-    const snapshot = await db.collection('pets').get();
-    const pets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const pets = await Pet.find();
     res.send(pets);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
+// Get a pet by ID
+app.get('/api/pets/:id', async (req, res) => {
+  try {
+    const pet = await Pet.findById(req.params.id);
+    if (!pet) return res.status(404).send({ error: 'Pet not found' });
+    res.send(pet);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Update a pet
+app.put('/api/pets/:id', async (req, res) => {
+  try {
+    const pet = await Pet.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!pet) return res.status(404).send({ error: 'Pet not found' });
+    res.send({ message: 'Pet updated!', pet });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// Delete a pet
+app.delete('/api/pets/:id', async (req, res) => {
+  try {
+    const pet = await Pet.findByIdAndDelete(req.params.id);
+    if (!pet) return res.status(404).send({ error: 'Pet not found' });
+    res.send({ message: 'Pet deleted!' });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+// ===== Start server =====
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running!`);
   console.log(`Status URL: http://localhost:${PORT}/api/status`);
   console.log(`Base URL: http://localhost:${PORT}`);
 });
+
 
