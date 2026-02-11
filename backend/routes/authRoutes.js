@@ -9,7 +9,7 @@ router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Basic validation
+    // validation
     if (!email || !password) {
       return res.status(400).send({ error: "Email and password are required." });
     }
