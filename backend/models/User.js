@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
 
     // optional fields for later
     name: { type: String, default: "" },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     createdAt: { type: Date, default: Date.now },
     isActive: { type: Boolean, default: true }
   },

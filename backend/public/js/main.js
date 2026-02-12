@@ -23,10 +23,13 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   
 	  msg.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
   
-	  // Temporary redirect (later will go to dashboard)
 	  setTimeout(() => {
-		window.location.href = "/dashboard.html";
-	  }, 900);
+		if (data.role === "admin") {
+		  window.location.href = "/admin.html";
+		} else {
+		  window.location.href = "/dashboard.html";
+		}
+	  }, 700);
   
 	} catch (err) {
 	  msg.innerHTML = `<div class="alert alert-danger">Server error. Try again.</div>`;

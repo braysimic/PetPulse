@@ -15,7 +15,9 @@ router.post("/register", async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.status(400).send({ error: "Password must be at least 8 characters." });
+      return res
+        .status(400)
+        .send({ error: "Password must be at least 8 characters." });
     }
 
     const existing = await User.findOne({ email: email.toLowerCase() });
@@ -27,7 +29,8 @@ router.post("/register", async (req, res) => {
 
     const newUser = await User.create({
       email: email.toLowerCase(),
-      passwordHash
+      passwordHash,
+      role: "user", // default role
     });
 
     res.send({ message: "Account created!", userId: newUser._id });
@@ -61,11 +64,40 @@ router.post("/login", async (req, res) => {
       return res.status(401).send({ error: "Invalid email or password." });
     }
 
-    // For now, just return success (later you can do sessions/JWT)
-    res.send({ message: "Login successful!", userId: user._id });
+    // ✅ Create session
+    req.session.userId = user._id.toString();
+    req.session.role = user.role;
+    req.session.email = user.email;
+
+    res.send({
+      message: "Login successful!",
+      userId: user._id,
+      role: user.role,
+    });
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
+// Logout
+router.post("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.send({ message: "Logged out." });
+  });
+});
+
+// Check current session
+router.get("/me", (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).send({ error: "Not logged in" });
+  }
+
+  res.send({
+    userId: req.session.userId,
+    role: req.session.role,
+    email: req.session.email,
+  });
+});
+
 module.exports = router;
+
