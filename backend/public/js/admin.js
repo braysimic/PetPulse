@@ -56,13 +56,13 @@ async function loadUsers() {
         <td>${user.email || ""}</td>
         <td>${user.name || "-"}</td>
         <td>
-          <span class="badge bg-info text-dark">${user.role || "user"}</span>
+          <span class="badge text-bg-light border">${user.role || "user"}</span>
         </td>
         <td>
-          <span class="badge bg-${isActiveBadge}">${isActiveText}</span>
+          <span class="badge text-bg-light border">${isActiveText}</span>
         </td>
         <td>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${user._id}">
+          <button class="btn btn-sm btn-outline-dark delete-btn" data-id="${user._id}">
             Delete
           </button>
         </td>
