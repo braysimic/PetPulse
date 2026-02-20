@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawTech | Profile</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    .profile-card {
+      border-radius: 16px;
+    }
+
+    .profile-avatar {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #dee2e6;
+    }
+
+    .avatar-placeholder {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #f1f1f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #888;
+      border: 2px dashed #ccc;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <div class="card shadow profile-card">
+          <div class="card-body p-4">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h3 class="fw-bold mb-0">Edit Profile</h3>
+              <a href="/dashboard.html" class="btn btn-outline-secondary btn-sm">
+                Back to Dashboard
+              </a>
+            </div>
+
+            <!-- Profile Picture Preview -->
+            <div class="text-center mb-4">
+              <img
+                id="avatarPreview"
+                class="profile-avatar d-none"
+                alt="Profile Picture"
+              />
+              <div id="avatarPlaceholder" class="avatar-placeholder">
+                No Image
+              </div>
+            </div>
+
+            <form id="profileForm" enctype="multipart/form-data">
+
+              <!-- Display Name -->
+              <div class="mb-3">
+                <label class="form-label">Display Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  maxlength="50"
+                  placeholder="Enter display name"
+                />
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  required
+                />
+              </div>
+
+              <!-- Bio -->
+              <div class="mb-3">
+                <label class="form-label">Bio</label>
+                <textarea
+                  class="form-control"
+                  id="bio"
+                  rows="3"
+                  maxlength="300"
+                  placeholder="Tell us about yourself..."
+                ></textarea>
+                <div class="text-end small text-muted">
+                  <span id="bioCount">0</span>/300 characters
+                </div>
+              </div>
+
+              <!-- File Upload -->
+              <div class="mb-4">
+                <label class="form-label">Upload Profile Picture</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="profilePicture"
+                  accept="image/*"
+                />
+                <div class="form-text">
+                  Allowed: JPG, PNG, WEBP (Max 2MB)
+                </div>
+              </div>
+
+              <!-- Save Button -->
+              <button type="submit" class="btn btn-primary w-100">
+                Save Changes
+              </button>
+
+              <!-- Message Area -->
+              <div id="profileMessage" class="mt-3"></div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/profile.js"></script>
+</body>
+</html>

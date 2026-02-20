@@ -6,24 +6,28 @@ const router = express.Router();
 
 /**
  * GET /api/admin/users
- * Admin can view all users
+ * Admin can view all users (basic info only)
  */
 router.get("/users", requireAdmin, async (req, res) => {
   try {
-    const users = await User.find().select("-passwordHash");
+    const users = await User.find()
+      .select("email name role isActive createdAt");
+
     res.send(users);
   } catch (err) {
     res.status(500).send({ error: err.message });
   }
 });
 
+
 /**
  * GET /api/admin/users/:id
- * Admin can view one user
+ * Admin can view detailed info for one user
  */
 router.get("/users/:id", requireAdmin, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-passwordHash");
+    const user = await User.findById(req.params.id)
+      .select("email name role isActive createdAt bio profilePicture");
 
     if (!user) {
       return res.status(404).send({ error: "User not found." });
@@ -35,17 +39,20 @@ router.get("/users/:id", requireAdmin, async (req, res) => {
   }
 });
 
+
 /**
  * DELETE /api/admin/users/:id
- * Admin can delete a user
+ * Admin can permanently delete a user
  */
 router.delete("/users/:id", requireAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Optional: prevent admin from deleting themselves
+    // Prevent admin from deleting themselves
     if (req.session.userId === userId) {
-      return res.status(400).send({ error: "You cannot delete your own account." });
+      return res.status(400).send({
+        error: "You cannot delete your own account."
+      });
     }
 
     const deleted = await User.findByIdAndDelete(userId);
@@ -54,9 +61,11 @@ router.delete("/users/:id", requireAdmin, async (req, res) => {
       return res.status(404).send({ error: "User not found." });
     }
 
-    // Later: delete pets, reminders, medical records, etc.
+    // TODO (future sprint):
+    // Also delete related pets, activities, medical records, etc.
 
     res.send({ message: "User deleted successfully." });
+
   } catch (err) {
     res.status(500).send({ error: err.message });
   }

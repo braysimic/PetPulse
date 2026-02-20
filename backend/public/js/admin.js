@@ -2,6 +2,7 @@ const tableBody = document.getElementById("usersTableBody");
 const msg = document.getElementById("adminMessage");
 const logoutBtn = document.getElementById("logoutBtn");
 
+// ===== Show Message =====
 function showMessage(type, text) {
   msg.innerHTML = `
     <div class="alert alert-${type} alert-dismissible fade show" role="alert">
@@ -11,10 +12,13 @@ function showMessage(type, text) {
   `;
 }
 
+// ===== Load All Users =====
 async function loadUsers() {
   tableBody.innerHTML = `
     <tr>
-      <td colspan="5" class="text-center text-muted py-4">Loading users...</td>
+      <td colspan="5" class="text-center text-muted py-4">
+        Loading users...
+      </td>
     </tr>
   `;
 
@@ -26,8 +30,8 @@ async function loadUsers() {
 
     const data = await res.json();
 
+    // Not admin or not logged in
     if (!res.ok) {
-      // Not admin or not logged in
       showMessage("danger", data.error || "Access denied.");
       setTimeout(() => {
         window.location.href = "/";
@@ -38,7 +42,9 @@ async function loadUsers() {
     if (!data.length) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="5" class="text-center text-muted py-4">No users found.</td>
+          <td colspan="5" class="text-center text-muted py-4">
+            No users found.
+          </td>
         </tr>
       `;
       return;
@@ -50,19 +56,28 @@ async function loadUsers() {
       const tr = document.createElement("tr");
 
       const isActiveText = user.isActive ? "Active" : "Disabled";
-      const isActiveBadge = user.isActive ? "success" : "secondary";
 
       tr.innerHTML = `
         <td>${user.email || ""}</td>
         <td>${user.name || "-"}</td>
         <td>
-          <span class="badge text-bg-light border">${user.role || "user"}</span>
+          <span class="badge text-bg-light border">
+            ${user.role || "user"}
+          </span>
         </td>
         <td>
-          <span class="badge text-bg-light border">${isActiveText}</span>
+          <span class="badge text-bg-light border">
+            ${isActiveText}
+          </span>
         </td>
-        <td>
-          <button class="btn btn-sm btn-outline-dark delete-btn" data-id="${user._id}">
+        <td class="d-flex gap-2">
+          <a href="/adminUser.html?id=${user._id}"
+             class="btn btn-sm btn-outline-primary">
+            View
+          </a>
+
+          <button class="btn btn-sm btn-outline-dark delete-btn"
+                  data-id="${user._id}">
             Delete
           </button>
         </td>
@@ -71,13 +86,13 @@ async function loadUsers() {
       tableBody.appendChild(tr);
     });
 
-    // Hook delete buttons
+    // Attach delete handlers
     document.querySelectorAll(".delete-btn").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const userId = btn.getAttribute("data-id");
 
         const confirmed = confirm(
-          "Are you sure you want to permanently delete this user?\n\nThis should also delete their pets, reminders, and records."
+          "Are you sure you want to permanently delete this user?\n\nThis will remove all associated data."
         );
 
         if (!confirmed) return;
@@ -91,6 +106,7 @@ async function loadUsers() {
   }
 }
 
+// ===== Delete User =====
 async function deleteUser(userId) {
   try {
     const res = await fetch(`/api/admin/users/${userId}`, {
@@ -105,7 +121,7 @@ async function deleteUser(userId) {
       return;
     }
 
-    showMessage("success", data.message || "User deleted!");
+    showMessage("success", data.message || "User deleted successfully.");
     loadUsers();
 
   } catch (err) {
@@ -113,7 +129,7 @@ async function deleteUser(userId) {
   }
 }
 
-// Logout button
+// ===== Logout =====
 logoutBtn.addEventListener("click", async () => {
   try {
     await fetch("/api/auth/logout", {
@@ -127,5 +143,5 @@ logoutBtn.addEventListener("click", async () => {
   }
 });
 
-// Load users on page load
+// ===== Initialize =====
 loadUsers();

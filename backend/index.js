@@ -9,13 +9,15 @@ const MongoStore = require("connect-mongo").default;
 
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
+const activityRoutes = require("./routes/activityRoutes");
+
 
 const app = express();
 
 // ===== Middleware =====
 app.use(express.json());
 
-// IMPORTANT: for sessions/cookies
 app.use(
   cors({
     origin: true,
@@ -23,7 +25,7 @@ app.use(
   })
 );
 
-// ===== Sessions =====
+// ===== Sessions (MUST COME BEFORE ROUTES) =====
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev_secret",
@@ -34,7 +36,7 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
@@ -52,16 +54,16 @@ mongoose
   .then(() => console.log("MongoDB connected!"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// ===== Routes =====
+// ===== API Routes =====
 app.get("/api/status", (req, res) => {
   res.send({ status: "PetPulse API is running!" });
 });
 
-// Auth routes
 app.use("/api/auth", authRoutes);
-
-// Admin routes
+app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/activities", activityRoutes);
+
 
 // ===== Start server =====
 const PORT = process.env.PORT || 3000;
@@ -70,9 +72,3 @@ app.listen(PORT, () => {
   console.log(`Status URL: http://localhost:${PORT}/api/status`);
   console.log(`Base URL: http://localhost:${PORT}`);
 });
-
-
-
-
-
-

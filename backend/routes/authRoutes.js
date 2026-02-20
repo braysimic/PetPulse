@@ -4,12 +4,11 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// Register
+// ===== Register =====
 router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // validation
     if (!email || !password) {
       return res.status(400).send({ error: "Email and password are required." });
     }
@@ -30,7 +29,7 @@ router.post("/register", async (req, res) => {
     const newUser = await User.create({
       email: email.toLowerCase(),
       passwordHash,
-      role: "user", // default role
+      role: "user",
     });
 
     res.send({ message: "Account created!", userId: newUser._id });
@@ -39,7 +38,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login
+// ===== Login =====
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -64,7 +63,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).send({ error: "Invalid email or password." });
     }
 
-    // ✅ Create session
+    // Create session
     req.session.userId = user._id.toString();
     req.session.role = user.role;
     req.session.email = user.email;
@@ -79,14 +78,19 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Logout
+// ===== Logout =====
 router.post("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.send({ message: "Logged out." });
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send({ error: "Logout failed." });
+    }
+
+    res.clearCookie("connect.sid");
+    res.send({ message: "Logged out successfully." });
   });
 });
 
-// Check current session
+// ===== Check current session =====
 router.get("/me", (req, res) => {
   if (!req.session.userId) {
     return res.status(401).send({ error: "Not logged in" });
@@ -100,4 +104,3 @@ router.get("/me", (req, res) => {
 });
 
 module.exports = router;
-
