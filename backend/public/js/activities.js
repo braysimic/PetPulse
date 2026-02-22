@@ -36,10 +36,10 @@ async function loadActivities() {
         </div>
 
         <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-success toggle-btn">
+          <button class="btn btn-sm btn-primary toggle-btn">
             ${a.completed ? "Undo" : "Done"}
           </button>
-          <button class="btn btn-sm btn-outline-danger delete-btn">
+          <button class="btn btn-sm btn-primary delete-btn">
             Delete
           </button>
         </div>
