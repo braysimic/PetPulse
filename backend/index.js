@@ -11,6 +11,8 @@ const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const petRoutes = require("./routes/petRoutes");
+
 
 
 const app = express();
@@ -63,6 +65,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/activities", activityRoutes);
+app.use("/api/pets", petRoutes);
 
 
 // ===== Start server =====
