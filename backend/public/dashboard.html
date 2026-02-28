@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PawTech | Dashboard</title>
 
+  <!-- Bootstrap -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
-  
-   <!-- Font -->
+
+  <!-- Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
@@ -20,24 +21,81 @@
 
 <body>
 
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-dark bg-dark px-4">
+  <span class="navbar-brand fw-bold app-title mb-0">
+    PawTech Solutions
+  </span>
+
+  <div class="ms-auto">
+
+    <!-- PROFILE DROPDOWN -->
+    <div class="dropdown">
+
+      <button class="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown">
+        <img
+          id="userAvatar"
+          src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          class="rounded-circle"
+          width="42"
+          height="42"
+          style="object-fit:cover; border:2px solid #eee;"
+        />
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-end shadow p-2"
+          style="min-width:260px">
+
+        <li>
+          <a class="dropdown-item fw-semibold" href="/profile.html">
+            My Profile
+          </a>
+        </li>
+
+        <li>
+          <button id="adminPanelBtn"
+                  class="dropdown-item d-none">
+            Admin Panel
+          </button>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li class="dropdown-header">Your Pets</li>
+
+        <!-- PET LIST -->
+        <div id="petDropdownList"></div>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li>
+          <button id="addPetBtn"
+                  class="dropdown-item text-primary fw-semibold">
+            + Add a Pet
+          </button>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <li>
+          <button id="logoutBtn"
+                  class="dropdown-item text-danger">
+            Logout
+          </button>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ================= MAIN ================= -->
 <div class="container py-5">
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="fw-bold app-title mb-0">Dashboard</h2>
-      <p class="text-muted sub-title mb-0">Welcome back!</p>
-    </div>
-
-    <div class="d-flex gap-2">
-      <button id="backToAdminBtn" class="btn btn-primary btn-sm d-none">
-        Admin Panel
-      </button>
-
-      <button id="logoutBtn" class="btn btn-primary btn-sm">
-        Logout
-      </button>
-    </div>
+  <div class="mb-4">
+    <h2 class="fw-bold app-title mb-0">Dashboard</h2>
+    <p class="text-muted sub-title mb-0">Welcome back!</p>
   </div>
 
   <!-- Action Cards -->
@@ -69,7 +127,7 @@
 
   </div>
 
-  <!-- Upcoming Activities Preview -->
+  <!-- Upcoming Activities -->
   <div class="card shadow-sm p-4">
     <h5 class="fw-bold mb-3">Upcoming Activities</h5>
     <div id="dashboardActivities">
@@ -78,6 +136,44 @@
   </div>
 
 </div>
+
+<!-- ================= ADD PET MODAL ================= -->
+<div class="modal fade" id="addPetModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5>Add New Pet</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <form id="addPetForm">
+          <input id="petName" class="form-control mb-2"
+                 placeholder="Pet Name" required>
+
+          <input id="petSpecies" class="form-control mb-2"
+                 placeholder="Species" required>
+
+          <input id="petBreed" class="form-control mb-3"
+                 placeholder="Breed" required>
+
+          <button class="btn btn-primary w-100">
+            Add Pet
+          </button>
+        </form>
+
+        <div id="petMessage" class="mt-3"></div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="js/dashboard.js"></script>
 </body>
