@@ -12,6 +12,9 @@ const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const petRoutes = require("./routes/petRoutes");
+const reminderRoutes = require("./routes/reminderRoutes");
+
+
 
 
 
@@ -66,6 +69,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/pets", petRoutes);
+app.use("/api/reminders", reminderRoutes);
 
 
 // ===== Start server =====
