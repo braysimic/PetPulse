@@ -45,11 +45,11 @@ body {
   font-weight: 700;
   font-size: clamp(2.2rem, 4vw, 3rem);
   font-variation-settings: "opsz" 72;
-  color: var(--pt-offwhite);
+  color: var(--pt-cream);
   letter-spacing: 0.5px;
 }
 
-.sub-title {
+.sub-script {
   font-size: 1.1rem;
   font-weight: 400;
   color: var(--pt-espresso);
@@ -87,7 +87,6 @@ body {
   padding-left: 12px;
 }
 
-
 /* Muted text: slightly warmer than default Bootstrap gray */
 .text-muted {
   color: rgba(61, 44, 46, 0.65) !important;
@@ -114,6 +113,13 @@ body {
   box-shadow: 0 0 0 0.15rem rgba(61, 44, 46, 0.2);
 }
 
+/* Dropdown items */
+.dropdown-header {
+  color: var(--pt-espresso);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 /* Buttons */
 .btn {
   border-radius: 12px;
@@ -124,15 +130,26 @@ body {
   border-color: var(--pt-clay);
 }
 
+.btn-important {
+  background: rgb(226, 102, 102);
+  border-color: rgb(226, 102, 102);
+}
+
+.btn-important:hover,
+.btn-important:focus {
+  background: rgb(194, 88, 88);
+  border-color: rgb(194, 88, 88);
+}
+
 .btn-primary:hover,
 .btn-primary:focus {
-  background: #2f2123;      /* slightly darker espresso */
-  border-color: #2f2123;
+  background: var(--pt-espresso);
+  border-color: var(--pt-espresso);
 }
 
 .btn-primary:active {
-  background: #24191a !important;
-  border-color: #24191a !important;
+  background: var(--pt-espresso) !important;
+  border-color: var(--pt-espresso) !important;
 }
 
 .btn-outline-primary {
@@ -152,6 +169,17 @@ a.text-decoration-none {
 
 a.text-decoration-none:hover {
   color: var(--pt-espresso);
+}
+
+/* Modal */
+
+.modal-title{
+  color: var(--pt-espresso) !important;
+  font-weight: 600;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(61, 44, 46, 0.12);
 }
 
 /* Optional: subtle “accent” utility classes you can use in future pages */

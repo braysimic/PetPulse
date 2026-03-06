@@ -38,7 +38,7 @@ async function loadPets() {
         <div class="dropdown-item d-flex justify-content-between align-items-center">
           <span>🐾 ${pet.name}</span>
 
-          <button class="btn btn-sm btn-outline-danger delete-pet"
+          <button class="btn btn-important"
                   data-id="${pet._id}">
             🗑
           </button>
