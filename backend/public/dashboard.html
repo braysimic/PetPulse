@@ -29,7 +29,6 @@
 
   <div class="ms-auto">
 
-    <!-- PROFILE DROPDOWN -->
     <div class="dropdown">
 
       <button class="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown">
@@ -63,7 +62,6 @@
 
         <li class="dropdown-header">Your Pets</li>
 
-        <!-- PET LIST -->
         <div id="petDropdownList"></div>
 
         <li><hr class="dropdown-divider"></li>
@@ -90,7 +88,8 @@
   </div>
 </nav>
 
-<!-- ================= MAIN ================= -->
+
+<!-- MAIN -->
 <div class="container py-5">
 
   <div class="mb-4">
@@ -98,7 +97,7 @@
     <p class="text-muted sub-script mb-0">Welcome back!</p>
   </div>
 
-  <!-- Action Cards -->
+  <!-- ACTION CARDS -->
   <div class="row g-4 mb-5">
 
     <div class="col-md-6">
@@ -157,17 +156,20 @@
 
   </div>
 
-  <!-- Upcoming Activities -->
+
+  <!-- UPCOMING REMINDERS -->
   <div class="card shadow-sm p-4">
-    <h5 class="fw-bold mb-3">Upcoming Activities</h5>
-    <div id="dashboardActivities">
-      <p class="text-muted">Loading...</p>
+    <h5 class="fw-bold mb-3">Upcoming Reminders</h5>
+
+    <div id="dashboardReminders">
+      <p class="text-muted">Loading reminders...</p>
     </div>
   </div>
 
 </div>
 
-<!-- ================= ADD PET MODAL ================= -->
+
+<!-- ADD PET MODAL -->
 <div class="modal fade" id="addPetModal">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -202,9 +204,9 @@
   </div>
 </div>
 
-<!-- Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/dashboard.js"></script>
+
 </body>
 </html>

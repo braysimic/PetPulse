@@ -22,115 +22,107 @@
     ← Back to Dashboard
   </a>
 
-  <div class="row justify-content-center">
-    <div class="col-md-7">
+<div class="row justify-content-center">
+<div class="col-md-7">
 
-      <div class="card shadow-sm p-4">
+<div class="card shadow-sm p-4">
 
-        <!-- Pet Avatar -->
-        <div class="text-center mb-4">
-          <img
-            id="petImage"
-            src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
-            class="rounded-circle mb-3"
-            width="130"
-            height="130"
-            style="object-fit:cover;border:3px solid #eee;"
-          />
+<!-- PET IMAGE -->
+<div class="text-center mb-4">
 
-          <input
-            type="file"
-            id="petPicture"
-            class="form-control"
-            accept="image/*"
-          />
+<img
+id="petImage"
+src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
+class="rounded-circle mb-3"
+width="130"
+height="130"
+style="object-fit:cover;border:3px solid #eee"
+/>
 
-          <small class="text-muted">
-            Profile picture upload (UI only for now)
-          </small>
-        </div>
+<input
+type="file"
+id="petPicture"
+class="form-control"
+accept="image/*"
+/>
 
-        <!-- ================= TABS ================= -->
-        <ul class="nav nav-tabs mb-4" id="petTabs">
+<small class="text-muted">
+Profile picture upload (UI only for now)
+</small>
 
-          <li class="nav-item">
-            <button
-              class="nav-link active"
-              data-bs-toggle="tab"
-              data-bs-target="#profileTab">
-              🐾 Profile
-            </button>
-          </li>
+</div>
 
-          <li class="nav-item">
-            <button
-              class="nav-link"
-              data-bs-toggle="tab"
-              data-bs-target="#documentsTab">
-              📄 Documents
-            </button>
-          </li>
 
-          <li class="nav-item">
-            <button
-              class="nav-link"
-              data-bs-toggle="tab"
-              data-bs-target="#medicationsTab">
-              💊 Medications
-            </button>
-          </li>
+<!-- TABS -->
+<ul class="nav nav-tabs mb-4">
 
-        </ul>
+<li class="nav-item">
+<button
+class="nav-link active"
+data-bs-toggle="tab"
+data-bs-target="#profileTab">
+🐾 Profile
+</button>
+</li>
 
-        <!-- ================= TAB CONTENT ================= -->
-        <div class="tab-content">
+<li class="nav-item">
+<button
+class="nav-link"
+data-bs-toggle="tab"
+data-bs-target="#documentsTab">
+📄 Documents
+</button>
+</li>
 
-          <!-- PROFILE TAB -->
-          <div class="tab-pane fade show active" id="profileTab">
+<li class="nav-item">
+<button
+class="nav-link"
+data-bs-toggle="tab"
+data-bs-target="#remindersTab">
+⏰ Reminders
+</button>
+</li>
 
-            <form id="petForm">
+</ul>
 
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Pet Name</label>
-                <input
-                  id="petName"
-                  class="form-control"
-                  required
-                />
-              </div>
 
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Species</label>
+<div class="tab-content">
 
-                <select
-                  id="petSpecies"
-                  class="form-control"
-                  required
-                >
-                  <option value="">Select Species</option>
-                  <option value="Dog">Dog</option>
-                  <option value="Cat">Cat</option>
-                  <option value="Bird">Bird</option>
-                  <option value="Rabbit">Rabbit</option>
-                  <option value="Hamster">Hamster</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+<!-- ================= PROFILE ================= -->
+<div class="tab-pane fade show active" id="profileTab">
 
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Breed</label>
-                <input
-                  id="petBreed"
-                  class="form-control"
-                  required
-                />
-              </div>
+<form id="petForm">
 
-              <button class="btn btn-primary w-100 mb-3">
-                Save Changes
-              </button>
+<div class="mb-3">
+<label class="form-label fw-semibold">Pet Name</label>
+<input id="petName" class="form-control" required />
+</div>
 
-            </form>
+<div class="mb-3">
+<label class="form-label fw-semibold">Species</label>
+
+<select id="petSpecies" class="form-select" required>
+<option value="">Select Species</option>
+<option value="Dog">Dog</option>
+<option value="Cat">Cat</option>
+<option value="Bird">Bird</option>
+<option value="Rabbit">Rabbit</option>
+<option value="Hamster">Hamster</option>
+<option value="Other">Other</option>
+</select>
+
+</div>
+
+<div class="mb-4">
+<label class="form-label fw-semibold">Breed</label>
+<input id="petBreed" class="form-control" required />
+</div>
+
+<button class="btn btn-primary w-100 mb-3">
+Save Changes
+</button>
+
+</form>
 
             <button
               id="deletePetBtn"
@@ -138,60 +130,79 @@
               Delete Pet
             </button>
 
-            <div id="petMessage" class="mt-3"></div>
-
-          </div>
-
-
-          <!-- DOCUMENTS TAB -->
-          <div class="tab-pane fade" id="documentsTab">
-
-            <div class="text-center py-5">
-
-              <h5 class="fw-bold">Pet Documents</h5>
-
-              <p class="text-muted">
-                Upload vet records, vaccination cards,
-                and medical documents here.
-              </p>
-
-              <button class="btn btn-outline-primary">
-                Upload Document (Coming Soon)
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- MEDICATIONS TAB -->
-          <div class="tab-pane fade" id="medicationsTab">
-
-            <div class="text-center py-5">
-
-              <h5 class="fw-bold">Medications</h5>
-
-              <p class="text-muted">
-                Track medications and prescriptions
-                for this pet.
-              </p>
-
-              <button class="btn btn-outline-primary">
-                Add Medication (Coming Soon)
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </div>
+<div id="petMessage" class="mt-3"></div>
 
 </div>
+
+
+<!-- ================= DOCUMENTS ================= -->
+<div class="tab-pane fade" id="documentsTab">
+
+<div class="text-center py-5">
+
+<h5 class="fw-bold">Pet Documents</h5>
+
+<p class="text-muted">
+Upload vet records, vaccination cards,
+and medical documents here.
+</p>
+
+<button class="btn btn-outline-primary">
+Upload Document (Coming Soon)
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= REMINDERS ================= -->
+<div class="tab-pane fade" id="remindersTab">
+
+<h5 class="fw-bold mb-3">Care Reminders</h5>
+
+<form id="reminderForm" class="mb-4">
+
+  <input
+  id="reminderTask"
+  class="form-control mb-2"
+  placeholder="Task (ex: Give medication)"
+  required
+  />
+  
+  <input
+  id="reminderDate"
+  type="datetime-local"
+  class="form-control mb-2"
+  required
+  />
+  
+  <select id="reminderRepeat" class="form-select mb-2">
+  <option value="none">Does not repeat</option>
+  <option value="daily">Daily</option>
+  <option value="weekly">Weekly</option>
+  <option value="monthly">Monthly</option>
+  </select>
+  
+  <button class="btn btn-primary w-100">
+  Add Reminder
+  </button>
+  
+  </form>
+
+<div id="reminderList">
+<p class="text-muted">Loading reminders...</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/pet.js"></script>
