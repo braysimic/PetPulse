@@ -17,9 +17,10 @@
 
 <div class="container py-5">
 
-<a href="/dashboard.html" class="btn btn-outline-secondary mb-4">
-← Back to Dashboard
-</a>
+  <!-- Back Button -->
+  <a href="/dashboard.html" class="btn btn-primary mb-4">
+    ← Back to Dashboard
+  </a>
 
 <div class="row justify-content-center">
 <div class="col-md-7">
@@ -100,7 +101,7 @@ data-bs-target="#remindersTab">
 <div class="mb-3">
 <label class="form-label fw-semibold">Species</label>
 
-<select id="petSpecies" class="form-select" required>
+<select id="petSpecies" class="form-control" required>
 <option value="">Select Species</option>
 <option value="Dog">Dog</option>
 <option value="Cat">Cat</option>
@@ -123,9 +124,11 @@ Save Changes
 
 </form>
 
-<button id="deletePetBtn" class="btn btn-outline-danger w-100">
-Delete Pet
-</button>
+            <button
+              id="deletePetBtn"
+              class="btn btn-important w-100">
+              Delete Pet
+            </button>
 
 <div id="petMessage" class="mt-3"></div>
 
