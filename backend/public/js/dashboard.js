@@ -5,188 +5,258 @@ const petList = document.getElementById("petDropdownList");
 const addPetBtn = document.getElementById("addPetBtn");
 
 const reminderContainer = document.getElementById("dashboardReminders");
+const notificationContainer = document.getElementById("notificationList");
 
 const modal = new bootstrap.Modal(
-  document.getElementById("addPetModal")
+document.getElementById("addPetModal")
 );
 
 
 // LOAD USER AVATAR
 async function loadUserAvatar() {
 
-  try {
+try {
 
-    const res = await fetch("/api/users/me", {
-      credentials: "include"
-    });
+const res = await fetch("/api/users/me", {
+credentials: "include"
+});
 
-    if (!res.ok) return;
+if (!res.ok) return;
 
-    const user = await res.json();
+const user = await res.json();
 
-    const avatar = document.getElementById("userAvatar");
+const avatar = document.getElementById("userAvatar");
 
-    avatar.src =
-      user.profilePicture && user.profilePicture.length > 0
-        ? user.profilePicture
-        : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+avatar.src =
+user.profilePicture && user.profilePicture.length > 0
+? user.profilePicture
+: "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-    if (user.role === "admin") {
-      adminPanelBtn?.classList.remove("d-none");
-    }
+if (user.role === "admin") {
+adminPanelBtn?.classList.remove("d-none");
+}
 
-  } catch {
+} catch {
 
-    window.location.href = "/";
+window.location.href = "/";
 
-  }
+}
 
 }
 
 
-// LOAD REMINDERS
+// LOAD DASHBOARD REMINDERS
 async function loadDashboardReminders() {
 
-  try {
+try {
 
-    const res = await fetch("/api/reminders", {
-      credentials: "include"
-    });
+const res = await fetch("/api/reminders", {
+credentials: "include"
+});
 
-    if (!res.ok) {
+if (!res.ok) {
 
-      reminderContainer.innerHTML =
-        "<p class='text-muted'>Unable to load reminders</p>";
+reminderContainer.innerHTML =
+"<p class='text-muted'>Unable to load reminders</p>";
 
-      return;
+return;
 
-    }
+}
 
-    const reminders = (await res.json())
-      .filter(r => !r.completed)
-      .sort((a,b) => new Date(a.date) - new Date(b.date));
+const reminders = (await res.json())
+.filter(r => !r.completed)
+.sort((a,b) => new Date(a.date) - new Date(b.date));
 
-    if (!reminders.length) {
+if (!reminders.length) {
 
-      reminderContainer.innerHTML =
-        "<p class='text-muted'>No upcoming reminders</p>";
+reminderContainer.innerHTML =
+"<p class='text-muted'>No upcoming reminders</p>";
 
-      return;
+return;
 
-    }
+}
 
-    reminderContainer.innerHTML = "";
+reminderContainer.innerHTML = "";
 
-    reminders.slice(0,5).forEach(reminder => {
+reminders.slice(0,5).forEach(reminder => {
 
-      const div = document.createElement("div");
+const div = document.createElement("div");
 
-      div.className = "mb-3 border-bottom pb-2";
+div.className = "mb-3 border-bottom pb-2";
 
-      div.innerHTML = `
-        <strong>🐾 ${reminder.pet.name}</strong>
+div.innerHTML = `
+<strong>🐾 ${reminder.pet.name}</strong>
+<div>${reminder.task}</div>
+<div class="small text-muted">
+${new Date(reminder.date).toLocaleString()}
+</div>
+`;
 
-        <div>
-          ${reminder.task}
-        </div>
+reminderContainer.appendChild(div);
 
-        <div class="small text-muted">
-          ${new Date(reminder.date).toLocaleString()}
-        </div>
-      `;
+});
 
-      reminderContainer.appendChild(div);
+} catch {
 
-    });
+reminderContainer.innerHTML =
+"<p class='text-muted'>Error loading reminders</p>";
 
-  } catch {
-
-    reminderContainer.innerHTML =
-      "<p class='text-muted'>Error loading reminders</p>";
-
-  }
+}
 
 }
 
 
-// PET DROPDOWN
+// 🔔 LOAD NOTIFICATION REMINDERS (NEXT HOUR)
+async function loadNotifications() {
+
+try {
+
+const res = await fetch("/api/reminders", {
+credentials: "include"
+});
+
+if (!res.ok) {
+
+notificationContainer.innerHTML =
+"<li class='dropdown-item text-danger'>Failed to load reminders</li>";
+
+return;
+
+}
+
+const reminders = await res.json();
+
+const now = new Date();
+const oneHour = new Date(now.getTime() + 60 * 60 * 1000);
+
+const upcoming = reminders.filter(r => {
+
+if (r.completed) return false;
+
+const time = new Date(r.date);
+
+return time >= now && time <= oneHour;
+
+});
+
+notificationContainer.innerHTML = "";
+
+if (!upcoming.length) {
+
+notificationContainer.innerHTML =
+"<li class='dropdown-item text-muted'>No reminders soon</li>";
+
+return;
+
+}
+
+upcoming.forEach(reminder => {
+
+const li = document.createElement("li");
+
+li.className = "dropdown-item small";
+
+li.innerHTML = `
+<strong>${reminder.pet.name}</strong><br>
+${reminder.task}<br>
+<span class="text-muted">
+${new Date(reminder.date).toLocaleTimeString()}
+</span>
+`;
+
+notificationContainer.appendChild(li);
+
+});
+
+} catch {
+
+notificationContainer.innerHTML =
+"<li class='dropdown-item text-danger'>Error loading reminders</li>";
+
+}
+
+}
+
+
+// LOAD PETS
 async function loadPets() {
 
-  try {
+try {
 
-    const res = await fetch("/api/pets", {
-      credentials: "include"
-    });
+const res = await fetch("/api/pets", {
+credentials: "include"
+});
 
-    const pets = await res.json();
+const pets = await res.json();
 
-    petList.innerHTML = "";
+petList.innerHTML = "";
 
-    if (!pets.length) {
+if (!pets.length) {
 
-      petList.innerHTML =
-        `<li class="dropdown-item text-muted">No pets yet</li>`;
+petList.innerHTML =
+`<li class="dropdown-item text-muted">No pets yet</li>`;
 
-      return;
+return;
 
-    }
+}
 
-    pets.forEach(pet => {
+pets.forEach(pet => {
 
-      const li = document.createElement("li");
+const li = document.createElement("li");
 
-      li.innerHTML = `
-        <div class="dropdown-item d-flex justify-content-between align-items-center">
+li.innerHTML = `
+<div class="dropdown-item d-flex justify-content-between align-items-center">
 
-          <a href="/pet.html?petId=${pet._id}"
-             class="text-decoration-none flex-grow-1">
-             🐾 ${pet.name}
-          </a>
+<a href="/pet.html?petId=${pet._id}"
+class="text-decoration-none flex-grow-1">
+🐾 ${pet.name}
+</a>
 
-          <button class="btn btn-sm btn-outline-danger delete-pet"
-                  data-id="${pet._id}">
-            🗑
-          </button>
+<button class="btn btn-sm btn-outline-danger delete-pet"
+data-id="${pet._id}">
+🗑
+</button>
 
-        </div>
-      `;
+</div>
+`;
 
-      petList.appendChild(li);
+petList.appendChild(li);
 
-    });
+});
 
-    attachDeleteHandlers();
+attachDeleteHandlers();
 
-  } catch {
+} catch {
 
-    petList.innerHTML =
-      `<li class="dropdown-item text-danger">Failed to load pets</li>`;
+petList.innerHTML =
+`<li class="dropdown-item text-danger">Failed to load pets</li>`;
 
-  }
+}
 
 }
 
 
+// DELETE PET HANDLERS
 function attachDeleteHandlers() {
 
-  document.querySelectorAll(".delete-pet").forEach(btn => {
+document.querySelectorAll(".delete-pet").forEach(btn => {
 
-    btn.onclick = async (e) => {
+btn.onclick = async (e) => {
 
-      e.stopPropagation();
+e.stopPropagation();
 
-      if (!confirm("Delete this pet?")) return;
+if (!confirm("Delete this pet?")) return;
 
-      await fetch(`/api/pets/${btn.dataset.id}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
+await fetch(`/api/pets/${btn.dataset.id}`, {
+method: "DELETE",
+credentials: "include"
+});
 
-      loadPets();
+loadPets();
 
-    };
+};
 
-  });
+});
 
 }
 
@@ -195,55 +265,55 @@ function attachDeleteHandlers() {
 addPetBtn?.addEventListener("click", () => modal.show());
 
 document
-  .getElementById("addPetForm")
-  ?.addEventListener("submit", async (e) => {
+.getElementById("addPetForm")
+?.addEventListener("submit", async (e) => {
 
-    e.preventDefault();
+e.preventDefault();
 
-    const body = {
-      name: petName.value,
-      species: petSpecies.value,
-      breed: petBreed.value
-    };
+const body = {
+name: petName.value,
+species: petSpecies.value,
+breed: petBreed.value
+};
 
-    const res = await fetch("/api/pets", {
+const res = await fetch("/api/pets", {
 
-      method: "POST",
+method: "POST",
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+headers: {
+"Content-Type": "application/json"
+},
 
-      credentials: "include",
+credentials: "include",
 
-      body: JSON.stringify(body)
+body: JSON.stringify(body)
 
-    });
+});
 
-    if (res.ok) {
+if (res.ok) {
 
-      modal.hide();
-      e.target.reset();
-      loadPets();
+modal.hide();
+e.target.reset();
+loadPets();
 
-    }
+}
 
-  });
+});
 
 
 // NAV BUTTONS
 adminPanelBtn?.addEventListener("click", () => {
-  window.location.href = "/admin.html";
+window.location.href = "/admin.html";
 });
 
 logoutBtn?.addEventListener("click", async () => {
 
-  await fetch("/api/auth/logout", {
-    method: "POST",
-    credentials: "include"
-  });
+await fetch("/api/auth/logout", {
+method: "POST",
+credentials: "include"
+});
 
-  window.location.href = "/";
+window.location.href = "/";
 
 });
 
@@ -252,3 +322,4 @@ logoutBtn?.addEventListener("click", async () => {
 loadUserAvatar();
 loadPets();
 loadDashboardReminders();
+loadNotifications();

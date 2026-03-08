@@ -1,211 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PawTech | Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PawTech | Dashboard</title>
 
-  <!-- Bootstrap -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+<!-- Bootstrap -->
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet"
+/>
 
-  <!-- Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/styles.css" />
+<!-- Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css" />
 </head>
 
 <body>
 
 <!-- ================= NAVBAR ================= -->
 <nav class="navbar navbar-dark px-4">
-  <span class="fw-bold app-title mb-0">
-    PawTech Solutions
-  </span>
 
-  <div class="ms-auto">
+<span class="fw-bold app-title mb-0">
+PawTech Solutions
+</span>
 
-    <div class="dropdown">
+<div class="ms-auto d-flex align-items-center gap-3">
 
-      <button class="btn p-0 border-0 bg-transparent" data-bs-toggle="dropdown">
-        <img
-          id="userAvatar"
-          src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-          class="rounded-circle"
-          width="42"
-          height="42"
-          style="object-fit:cover; border:2px solid #eee;"
-        />
-      </button>
+<!-- 🔔 NOTIFICATION BELL -->
+<div class="dropdown">
 
-      <ul class="dropdown-menu dropdown-menu-end shadow p-2"
-          style="min-width:260px">
+<button
+class="btn position-relative"
+id="notificationBell"
+data-bs-toggle="dropdown"
+>
 
-        <li>
-          <a class="dropdown-item fw-semibold" href="/profile.html">
-            My Profile
-          </a>
-        </li>
+<i class="bi bi-bell fs-5"></i>
 
-        <li>
-          <button id="adminPanelBtn"
-                  class="dropdown-item d-none">
-            Admin Panel
-          </button>
-        </li>
+<span
+id="notificationBadge"
+class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+0
+</span>
 
-        <li><hr class="dropdown-divider"></li>
+</button>
 
-        <li class="dropdown-header">Your Pets</li>
+<ul
+class="dropdown-menu dropdown-menu-end shadow p-2"
+style="min-width:300px"
+>
 
-        <div id="petDropdownList"></div>
+<li class="dropdown-header fw-semibold">
+Upcoming Reminders (Next Hour)
+</li>
 
-        <li><hr class="dropdown-divider"></li>
+<div id="notificationList">
 
-        <li>
-          <button id="addPetBtn"
-                  class="dropdown-item text-primary fw-semibold">
-            + Add a Pet
-          </button>
-        </li>
+<li class="dropdown-item text-muted">
+Loading reminders...
+</li>
 
-        <li><hr class="dropdown-divider"></li>
+</div>
 
-        <li>
-          <button id="logoutBtn"
-                  class="dropdown-item text-danger">
-            Logout
-          </button>
-        </li>
+</ul>
 
-      </ul>
-    </div>
+</div>
 
-  </div>
+
+<!-- PROFILE DROPDOWN -->
+<div class="dropdown">
+
+<button
+class="btn p-0 border-0 bg-transparent"
+data-bs-toggle="dropdown"
+>
+
+<img
+id="userAvatar"
+src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+class="rounded-circle"
+width="42"
+height="42"
+style="object-fit:cover; border:2px solid #eee;"
+/>
+
+</button>
+
+<ul
+class="dropdown-menu dropdown-menu-end shadow p-2"
+style="min-width:260px"
+>
+
+<li>
+<a class="dropdown-item fw-semibold" href="/profile.html">
+My Profile
+</a>
+</li>
+
+<li>
+<button
+id="adminPanelBtn"
+class="dropdown-item d-none">
+Admin Panel
+</button>
+</li>
+
+<li><hr class="dropdown-divider"></li>
+
+<li class="dropdown-header">Your Pets</li>
+
+<div id="petDropdownList"></div>
+
+<li><hr class="dropdown-divider"></li>
+
+<li>
+<button
+id="addPetBtn"
+class="dropdown-item text-primary fw-semibold">
++ Add a Pet
+</button>
+</li>
+
+<li><hr class="dropdown-divider"></li>
+
+<li>
+<button
+id="logoutBtn"
+class="dropdown-item text-danger">
+Logout
+</button>
+</li>
+
+</ul>
+
+</div>
+
+</div>
 </nav>
 
 
-<!-- MAIN -->
+<!-- ================= MAIN ================= -->
 <div class="container py-5">
 
-  <div class="mb-4">
-    <h2 class="fw-bold app-title mb-0">Dashboard</h2>
-    <p class="text-muted sub-script mb-0">Welcome back!</p>
-  </div>
-
-  <!-- ACTION CARDS -->
-  <div class="row g-4 mb-5">
-
-    <div class="col-md-6">
-      <div class="card shadow-sm dashboard-card p-4 h-100">
-        <h5 class="fw-bold">Manage Activities</h5>
-        <p class="text-muted small">
-          Add tasks, set reminders, and track daily pet care activities.
-        </p>
-        <a href="/activities.html" class="btn btn-primary mt-auto">
-          Go to Activities
-        </a>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card shadow-sm dashboard-card p-4 h-100">
-        <h5 class="fw-bold">Pet Stats This Week:</h5>
-        <ul class="text-muted small">
-          <li>🐾 3 walks</li>
-          <li>🍽️ 14 meals</li>
-          <li>🛁 1 bath</li>
-          <li>Functionality Coming Soon!</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card shadow-sm dashboard-card p-4 h-100">
-        <h5 class="fw-bold">Pet Name/Individual Pet Card</h5>
-        <ul class="text-muted small">
-          <li>Breed: </li>
-          <li>Next Activity</li>
-          <li>Completed Activities</li>
-          <li>Functionality Coming Soon!</li>
-        </ul>
-        <a href="/pet.html" class="btn btn-primary mt-auto">
-          Go to Pet Profile
-        </a>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card shadow-sm dashboard-card p-4 h-100">
-        <h5 class="fw-bold">Pet Name/Individual Pet Card</h5>
-        <ul class="text-muted small">
-          <li>Breed: </li>
-          <li>Next Activity</li>
-          <li>Completed Activities</li>
-          <li>Functionality Coming Soon!</li>
-        </ul>
-        <a href="/pet.html" class="btn btn-primary mt-auto">
-          Go to Pet Profile
-        </a>
-      </div>
-    </div>
-
-  </div>
+<div class="mb-4">
+<h2 class="fw-bold app-title mb-0">Dashboard</h2>
+<p class="text-muted sub-script mb-0">Welcome back!</p>
+</div>
 
 
-  <!-- UPCOMING REMINDERS -->
-  <div class="card shadow-sm p-4">
-    <h5 class="fw-bold mb-3">Upcoming Reminders</h5>
+<!-- ACTION CARDS -->
+<div class="row g-4 mb-5">
 
-    <div id="dashboardReminders">
-      <p class="text-muted">Loading reminders...</p>
-    </div>
-  </div>
+<div class="col-md-6">
+<div class="card shadow-sm dashboard-card p-4 h-100">
+
+<h5 class="fw-bold">
+<i class="bi bi-list-check me-2"></i>
+Manage Activities
+</h5>
+
+<p class="text-muted small">
+Add tasks, set reminders, and track daily pet care activities.
+</p>
+
+<a href="/activities.html" class="btn btn-primary mt-auto">
+Go to Activities
+</a>
+
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class="card shadow-sm dashboard-card p-4 h-100">
+
+<h5 class="fw-bold">
+<i class="bi bi-graph-up me-2"></i>
+Pet Stats This Week
+</h5>
+
+<ul class="text-muted small">
+
+<li>🐾 3 walks</li>
+<li>🍽️ 14 meals</li>
+<li>🛁 1 bath</li>
+<li>Functionality Coming Soon!</li>
+
+</ul>
+
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class="card shadow-sm dashboard-card p-4 h-100">
+
+<h5 class="fw-bold">
+<i class="bi bi-heart me-2"></i>
+Pet Profile
+</h5>
+
+<ul class="text-muted small">
+
+<li>Breed:</li>
+<li>Next Activity</li>
+<li>Completed Activities</li>
+<li>Functionality Coming Soon!</li>
+
+</ul>
+
+<a href="/pet.html" class="btn btn-primary mt-auto">
+Go to Pet Profile
+</a>
+
+</div>
+</div>
+
+
+<div class="col-md-6">
+<div class="card shadow-sm dashboard-card p-4 h-100">
+
+<h5 class="fw-bold">
+<i class="bi bi-heart me-2"></i>
+Pet Profile
+</h5>
+
+<ul class="text-muted small">
+
+<li>Breed:</li>
+<li>Next Activity</li>
+<li>Completed Activities</li>
+<li>Functionality Coming Soon!</li>
+
+</ul>
+
+<a href="/pet.html" class="btn btn-primary mt-auto">
+Go to Pet Profile
+</a>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- UPCOMING REMINDERS -->
+<div class="card shadow-sm p-4">
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-alarm me-2"></i>
+Upcoming Reminders
+</h5>
+
+<div id="dashboardReminders">
+
+<p class="text-muted">
+Loading reminders...
+</p>
+
+</div>
+
+</div>
 
 </div>
 
 
 <!-- ADD PET MODAL -->
 <div class="modal fade" id="addPetModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class = "modal-title">Add New Pet</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+<div class="modal-dialog">
+<div class="modal-content">
 
-      <div class="modal-body">
+<div class="modal-header">
 
-        <form id="addPetForm">
-          <input id="petName" class="form-control mb-2"
-                 placeholder="Pet Name" required>
+<h5 class="modal-title">
+Add New Pet
+</h5>
 
-          <input id="petSpecies" class="form-control mb-2"
-                 placeholder="Species" required>
+<button class="btn-close" data-bs-dismiss="modal"></button>
 
-          <input id="petBreed" class="form-control mb-3"
-                 placeholder="Breed" required>
+</div>
 
-          <button class="btn btn-primary w-100">
-            Add Pet
-          </button>
-        </form>
 
-        <div id="petMessage" class="mt-3"></div>
+<div class="modal-body">
 
-      </div>
+<form id="addPetForm">
 
-    </div>
-  </div>
+<input
+id="petName"
+class="form-control mb-2"
+placeholder="Pet Name"
+required
+/>
+
+<input
+id="petSpecies"
+class="form-control mb-2"
+placeholder="Species"
+required
+/>
+
+<input
+id="petBreed"
+class="form-control mb-3"
+placeholder="Breed"
+required
+/>
+
+<button class="btn btn-primary w-100">
+Add Pet
+</button>
+
+</form>
+
+<div id="petMessage" class="mt-3"></div>
+
+</div>
+
+</div>
+</div>
 </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="js/dashboard.js"></script>
 
 </body>
