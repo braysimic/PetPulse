@@ -260,6 +260,155 @@ function attachReminderHandlers() {
 
 }
 
+// ================= MEDICAL RECORDS =================
+
+const medicalForm = document.getElementById("medicalForm");
+const medicalList = document.getElementById("medicalList");
+
+// LOAD MEDICAL RECORDS
+async function loadMedicalRecords() {
+
+  const res = await fetch(`/api/medical/${petId}`, {
+    credentials: "include"
+  });
+
+  const records = await res.json();
+
+  renderMedicalRecords(records);
+}
+
+// RENDER
+function renderMedicalRecords(records) {
+
+  medicalList.innerHTML = "";
+
+  if (!records.length) {
+    medicalList.innerHTML =
+      "<p class='text-muted'>No records found</p>";
+    return;
+  }
+
+  records.forEach(r => {
+
+    const div = document.createElement("div");
+
+    div.className =
+      "border p-2 rounded mb-2 d-flex justify-content-between align-items-center";
+
+    div.innerHTML = `
+
+      <div>
+        <strong>${r.type.toUpperCase()}</strong>
+
+        <div>${r.description}</div>
+
+        <div class="small text-muted">
+          ${new Date(r.date).toLocaleDateString()}
+        </div>
+
+        ${
+          r.fileUrl
+            ? `<a href="${r.fileUrl}" target="_blank">View File</a>`
+            : ""
+        }
+      </div>
+
+      <button class="btn btn-sm btn-outline-danger deleteRecord"
+              data-id="${r._id}">
+        🗑
+      </button>
+
+    `;
+
+    medicalList.appendChild(div);
+  });
+
+  attachMedicalHandlers();
+}
+
+// CREATE RECORD
+medicalForm?.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  const formData = new FormData();
+
+  formData.append("petId", petId);
+  formData.append("type", medicalType.value);
+  formData.append("date", medicalDate.value);
+  formData.append("description", medicalDescription.value);
+
+  if (medicalFile.files[0]) {
+    formData.append("file", medicalFile.files[0]);
+  }
+
+  const res = await fetch("/api/medical", {
+    method: "POST",
+    credentials: "include",
+    body: formData
+  });
+
+  if (res.ok) {
+    medicalForm.reset();
+    loadMedicalRecords();
+  }
+});
+
+// DELETE
+function attachMedicalHandlers() {
+
+  document.querySelectorAll(".deleteRecord").forEach(btn => {
+
+    btn.onclick = async () => {
+
+      if (!confirm("Delete this record?")) return;
+
+      await fetch(`/api/medical/${btn.dataset.id}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      loadMedicalRecords();
+    };
+
+  });
+}
+
+// SEARCH
+document.getElementById("searchKeyword")?.addEventListener("input", filterRecords);
+document.getElementById("searchDate")?.addEventListener("input", filterRecords);
+
+let allRecords = [];
+
+async function filterRecords() {
+
+  const keyword = searchKeyword.value.toLowerCase();
+  const date = searchDate.value;
+
+  const res = await fetch(`/api/medical/${petId}`, {
+    credentials: "include"
+  });
+
+  allRecords = await res.json();
+
+  let filtered = allRecords.filter(r => {
+
+    const matchKeyword =
+      r.description.toLowerCase().includes(keyword) ||
+      r.type.toLowerCase().includes(keyword);
+
+    const matchDate =
+      !date || r.date.startsWith(date);
+
+    return matchKeyword && matchDate;
+  });
+
+  renderMedicalRecords(filtered);
+}
+
+// INIT
+loadMedicalRecords();
+
 
 // ================= INIT =================
 loadPet();
