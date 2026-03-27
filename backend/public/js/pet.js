@@ -11,9 +11,7 @@ const reminderList = document.getElementById("reminderList");
 
 // ================= LOAD PET =================
 async function loadPet() {
-
   try {
-
     const res = await fetch(`/api/pets/${petId}`, {
       credentials: "include"
     });
@@ -30,17 +28,13 @@ async function loadPet() {
     petBreed.value = pet.breed;
 
   } catch {
-
     window.location.href = "/dashboard.html";
-
   }
-
 }
 
 
 // ================= UPDATE PET =================
 form.addEventListener("submit", async (e) => {
-
   e.preventDefault();
 
   const body = {
@@ -50,39 +44,27 @@ form.addEventListener("submit", async (e) => {
   };
 
   const res = await fetch(`/api/pets/${petId}`, {
-
     method: "PUT",
-
-    headers: {
-      "Content-Type": "application/json"
-    },
-
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
-
     body: JSON.stringify(body)
-
   });
 
   const data = await res.json();
 
   if (!res.ok) {
-
     message.innerHTML =
       `<div class="alert alert-danger">${data.error}</div>`;
-
     return;
-
   }
 
   message.innerHTML =
     `<div class="alert alert-success">Pet updated successfully</div>`;
-
 });
 
 
 // ================= DELETE PET =================
 deleteBtn.addEventListener("click", async () => {
-
   if (!confirm("Delete this pet permanently?")) return;
 
   const res = await fetch(`/api/pets/${petId}`, {
@@ -93,7 +75,6 @@ deleteBtn.addEventListener("click", async () => {
   if (res.ok) {
     window.location.href = "/dashboard.html";
   }
-
 });
 
 
@@ -113,12 +94,9 @@ async function loadReminders() {
   reminderList.innerHTML = "";
 
   if (!petReminders.length) {
-
     reminderList.innerHTML =
       "<p class='text-muted'>No reminders yet</p>";
-
     return;
-
   }
 
   petReminders.forEach(reminder => {
@@ -129,7 +107,6 @@ async function loadReminders() {
       "d-flex justify-content-between align-items-center mb-2 border p-2 rounded";
 
     div.innerHTML = `
-
       <div>
 
         <input
@@ -156,56 +133,37 @@ async function loadReminders() {
       data-id="${reminder._id}">
       🗑
       </button>
-
     `;
 
     reminderList.appendChild(div);
-
   });
 
   attachReminderHandlers();
-
 }
 
 
 // ================= CREATE REMINDER =================
 reminderForm?.addEventListener("submit", async (e) => {
-
   e.preventDefault();
 
   const body = {
-
     petId,
-
     task: reminderTask.value,
-
     date: reminderDate.value,
-
     repeat: reminderRepeat.value
-
   };
 
   const res = await fetch("/api/reminders", {
-
     method: "POST",
-
-    headers: {
-      "Content-Type": "application/json"
-    },
-
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
-
     body: JSON.stringify(body)
-
   });
 
   if (res.ok) {
-
     reminderForm.reset();
     loadReminders();
-
   }
-
 });
 
 
@@ -213,69 +171,63 @@ reminderForm?.addEventListener("submit", async (e) => {
 function attachReminderHandlers() {
 
   document.querySelectorAll(".completeReminder").forEach(box => {
-
     box.onclick = async () => {
 
       await fetch(`/api/reminders/${box.dataset.id}`, {
-
         method: "PUT",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-
         body: JSON.stringify({
           completed: box.checked
         })
-
       });
 
       loadReminders();
-
     };
-
   });
 
-
   document.querySelectorAll(".deleteReminder").forEach(btn => {
-
     btn.onclick = async () => {
 
       if (!confirm("Delete this reminder?")) return;
 
       await fetch(`/api/reminders/${btn.dataset.id}`, {
-
         method: "DELETE",
         credentials: "include"
-
       });
 
       loadReminders();
-
     };
-
   });
-
 }
+
 
 // ================= MEDICAL RECORDS =================
 
 const medicalForm = document.getElementById("medicalForm");
 const medicalList = document.getElementById("medicalList");
 
-// LOAD MEDICAL RECORDS
-async function loadMedicalRecords() {
+let editingRecordId = null;
+let allRecords = [];
 
+// 🔥 FIXED DATE FUNCTION
+function formatDate(dateString) {
+  const d = new Date(dateString);
+  const fixed = new Date(d.getTime() + d.getTimezoneOffset() * 60000);
+  return fixed.toLocaleDateString();
+}
+
+
+// LOAD
+async function loadMedicalRecords() {
   const res = await fetch(`/api/medical/${petId}`, {
     credentials: "include"
   });
 
-  const records = await res.json();
-
-  renderMedicalRecords(records);
+  allRecords = await res.json();
+  renderMedicalRecords(allRecords);
 }
+
 
 // RENDER
 function renderMedicalRecords(records) {
@@ -296,14 +248,13 @@ function renderMedicalRecords(records) {
       "border p-2 rounded mb-2 d-flex justify-content-between align-items-center";
 
     div.innerHTML = `
-
       <div>
         <strong>${r.type.toUpperCase()}</strong>
 
         <div>${r.description}</div>
 
         <div class="small text-muted">
-          ${new Date(r.date).toLocaleDateString()}
+          ${formatDate(r.date)}
         </div>
 
         ${
@@ -313,11 +264,19 @@ function renderMedicalRecords(records) {
         }
       </div>
 
-      <button class="btn btn-sm btn-outline-danger deleteRecord"
-              data-id="${r._id}">
-        🗑
-      </button>
+      <div class="d-flex gap-2">
 
+        <button class="btn btn-sm btn-outline-secondary editRecord"
+                data-id="${r._id}">
+          ✏️
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger deleteRecord"
+                data-id="${r._id}">
+          🗑
+        </button>
+
+      </div>
     `;
 
     medicalList.appendChild(div);
@@ -326,7 +285,8 @@ function renderMedicalRecords(records) {
   attachMedicalHandlers();
 }
 
-// CREATE RECORD
+
+// CREATE + UPDATE
 medicalForm?.addEventListener("submit", async (e) => {
 
   e.preventDefault();
@@ -342,23 +302,35 @@ medicalForm?.addEventListener("submit", async (e) => {
     formData.append("file", medicalFile.files[0]);
   }
 
-  const res = await fetch("/api/medical", {
-    method: "POST",
+  let url = "/api/medical";
+  let method = "POST";
+
+  if (editingRecordId) {
+    url = `/api/medical/${editingRecordId}`;
+    method = "PUT";
+  }
+
+  const res = await fetch(url, {
+    method,
     credentials: "include",
     body: formData
   });
 
   if (res.ok) {
     medicalForm.reset();
+    editingRecordId = null;
+
+    medicalForm.querySelector("button").innerText = "Save Record";
+
     loadMedicalRecords();
   }
 });
 
-// DELETE
+
+// HANDLERS
 function attachMedicalHandlers() {
 
   document.querySelectorAll(".deleteRecord").forEach(btn => {
-
     btn.onclick = async () => {
 
       if (!confirm("Delete this record?")) return;
@@ -370,28 +342,37 @@ function attachMedicalHandlers() {
 
       loadMedicalRecords();
     };
+  });
 
+  document.querySelectorAll(".editRecord").forEach(btn => {
+    btn.onclick = () => {
+
+      const record = allRecords.find(r => r._id === btn.dataset.id);
+
+      medicalType.value = record.type;
+      medicalDescription.value = record.description;
+      medicalDate.value = record.date.split("T")[0];
+
+      editingRecordId = record._id;
+
+      medicalForm.querySelector("button").innerText = "Update Record";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
   });
 }
+
 
 // SEARCH
 document.getElementById("searchKeyword")?.addEventListener("input", filterRecords);
 document.getElementById("searchDate")?.addEventListener("input", filterRecords);
 
-let allRecords = [];
-
-async function filterRecords() {
+function filterRecords() {
 
   const keyword = searchKeyword.value.toLowerCase();
   const date = searchDate.value;
 
-  const res = await fetch(`/api/medical/${petId}`, {
-    credentials: "include"
-  });
-
-  allRecords = await res.json();
-
-  let filtered = allRecords.filter(r => {
+  const filtered = allRecords.filter(r => {
 
     const matchKeyword =
       r.description.toLowerCase().includes(keyword) ||
@@ -406,10 +387,8 @@ async function filterRecords() {
   renderMedicalRecords(filtered);
 }
 
-// INIT
-loadMedicalRecords();
-
 
 // ================= INIT =================
 loadPet();
 loadReminders();
+loadMedicalRecords();
