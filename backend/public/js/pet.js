@@ -8,6 +8,15 @@ const deleteBtn = document.getElementById("deletePetBtn");
 const reminderForm = document.getElementById("reminderForm");
 const reminderList = document.getElementById("reminderList");
 
+// ===== VIEW MODE =====
+const petView = document.getElementById("petView");
+const editBtn = document.getElementById("editBtn");
+const cancelEdit = document.getElementById("cancelEdit");
+
+const viewName = document.getElementById("viewName");
+const viewSpecies = document.getElementById("viewSpecies");
+const viewBreed = document.getElementById("viewBreed");
+
 
 // ================= LOAD PET =================
 async function loadPet() {
@@ -23,14 +32,32 @@ async function loadPet() {
 
     const pet = await res.json();
 
+    // EDIT FORM
     petName.value = pet.name;
     petSpecies.value = pet.species;
     petBreed.value = pet.breed;
+
+    // VIEW MODE
+    viewName.innerText = pet.name;
+    viewSpecies.innerText = pet.species;
+    viewBreed.innerText = pet.breed;
 
   } catch {
     window.location.href = "/dashboard.html";
   }
 }
+
+
+// ================= TOGGLE EDIT =================
+editBtn?.addEventListener("click", () => {
+  petView.classList.add("d-none");
+  form.classList.remove("d-none");
+});
+
+cancelEdit?.addEventListener("click", () => {
+  form.classList.add("d-none");
+  petView.classList.remove("d-none");
+});
 
 
 // ================= UPDATE PET =================
@@ -60,11 +87,21 @@ form.addEventListener("submit", async (e) => {
 
   message.innerHTML =
     `<div class="alert alert-success">Pet updated successfully</div>`;
+
+  // UPDATE VIEW MODE
+  viewName.innerText = petName.value;
+  viewSpecies.innerText = petSpecies.value;
+  viewBreed.innerText = petBreed.value;
+
+  // SWITCH BACK
+  form.classList.add("d-none");
+  petView.classList.remove("d-none");
 });
 
 
 // ================= DELETE PET =================
 deleteBtn.addEventListener("click", async () => {
+
   if (!confirm("Delete this pet permanently?")) return;
 
   const res = await fetch(`/api/pets/${petId}`, {
@@ -108,30 +145,28 @@ async function loadReminders() {
 
     div.innerHTML = `
       <div>
-
         <input
-        type="checkbox"
-        ${reminder.completed ? "checked" : ""}
-        class="completeReminder"
-        data-id="${reminder._id}"
+          type="checkbox"
+          ${reminder.completed ? "checked" : ""}
+          class="completeReminder"
+          data-id="${reminder._id}"
         />
 
         <strong class="${
           reminder.completed ? "text-decoration-line-through text-muted" : ""
         }">
-        ${reminder.task}
+          ${reminder.task}
         </strong>
 
         <div class="small text-muted">
-        ${new Date(reminder.date).toLocaleString()}
+          ${new Date(reminder.date).toLocaleString()}
         </div>
-
       </div>
 
       <button
-      class="btn btn-sm btn-outline-danger deleteReminder"
-      data-id="${reminder._id}">
-      🗑
+        class="btn btn-sm btn-outline-danger deleteReminder"
+        data-id="${reminder._id}">
+        🗑
       </button>
     `;
 
@@ -144,6 +179,7 @@ async function loadReminders() {
 
 // ================= CREATE REMINDER =================
 reminderForm?.addEventListener("submit", async (e) => {
+
   e.preventDefault();
 
   const body = {
@@ -203,14 +239,12 @@ function attachReminderHandlers() {
 
 
 // ================= MEDICAL RECORDS =================
-
 const medicalForm = document.getElementById("medicalForm");
 const medicalList = document.getElementById("medicalList");
 
 let editingRecordId = null;
 let allRecords = [];
 
-// 🔥 FIXED DATE FUNCTION
 function formatDate(dateString) {
   const d = new Date(dateString);
   const fixed = new Date(d.getTime() + d.getTimezoneOffset() * 60000);
@@ -250,13 +284,8 @@ function renderMedicalRecords(records) {
     div.innerHTML = `
       <div>
         <strong>${r.type.toUpperCase()}</strong>
-
         <div>${r.description}</div>
-
-        <div class="small text-muted">
-          ${formatDate(r.date)}
-        </div>
-
+        <div class="small text-muted">${formatDate(r.date)}</div>
         ${
           r.fileUrl
             ? `<a href="${r.fileUrl}" target="_blank">View File</a>`
@@ -265,17 +294,13 @@ function renderMedicalRecords(records) {
       </div>
 
       <div class="d-flex gap-2">
-
-        <button class="btn btn-sm btn-outline-secondary editRecord"
-                data-id="${r._id}">
+        <button class="btn btn-sm btn-outline-secondary editRecord" data-id="${r._id}">
           ✏️
         </button>
 
-        <button class="btn btn-sm btn-outline-danger deleteRecord"
-                data-id="${r._id}">
+        <button class="btn btn-sm btn-outline-danger deleteRecord" data-id="${r._id}">
           🗑
         </button>
-
       </div>
     `;
 
@@ -286,7 +311,7 @@ function renderMedicalRecords(records) {
 }
 
 
-// CREATE + UPDATE
+// CREATE / UPDATE
 medicalForm?.addEventListener("submit", async (e) => {
 
   e.preventDefault();
@@ -319,9 +344,7 @@ medicalForm?.addEventListener("submit", async (e) => {
   if (res.ok) {
     medicalForm.reset();
     editingRecordId = null;
-
     medicalForm.querySelector("button").innerText = "Save Record";
-
     loadMedicalRecords();
   }
 });
