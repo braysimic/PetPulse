@@ -1,64 +1,144 @@
 const reminderContainer = document.getElementById("dashboardReminders");
 
-// LOAD DASHBOARD REMINDERS
+// ================= LOAD REMINDERS =================
 async function loadDashboardReminders() {
+  try {
 
-try {
+    const res = await fetch("/api/reminders", {
+      credentials: "include"
+    });
 
-const res = await fetch("/api/reminders", {
-credentials: "include"
-});
+    if (!res.ok) {
+      reminderContainer.innerHTML =
+        "<p class='text-muted'>Unable to load reminders</p>";
+      return;
+    }
 
-if (!res.ok) {
+    const reminders = (await res.json())
+      .filter(r => !r.completed)
+      .sort((a,b) => new Date(a.date) - new Date(b.date));
 
-reminderContainer.innerHTML =
-"<p class='text-muted'>Unable to load reminders</p>";
+    if (!reminders.length) {
+      reminderContainer.innerHTML =
+        "<p class='text-muted'>No upcoming reminders</p>";
+      return;
+    }
 
-return;
+    reminderContainer.innerHTML = "";
 
+    reminders.slice(0,5).forEach(reminder => {
+
+      const div = document.createElement("div");
+
+      div.className = "mb-3 border-bottom pb-2";
+
+      div.innerHTML = `
+        <strong>🐾 ${reminder.pet.name}</strong>
+        <div>${reminder.task}</div>
+        <div class="small text-muted">
+          ${new Date(reminder.date).toLocaleString()}
+        </div>
+      `;
+
+      reminderContainer.appendChild(div);
+    });
+
+  } catch {
+    reminderContainer.innerHTML =
+      "<p class='text-muted'>Error loading reminders</p>";
+  }
 }
 
-const reminders = (await res.json())
-.filter(r => !r.completed)
-.sort((a,b) => new Date(a.date) - new Date(b.date));
 
-if (!reminders.length) {
+// ================= LOAD PET CARDS =================
+async function loadPetCards() {
+  try {
 
-reminderContainer.innerHTML =
-"<p class='text-muted'>No upcoming reminders</p>";
+    const [petsRes, remindersRes] = await Promise.all([
+      fetch("/api/pets", { credentials: "include" }),
+      fetch("/api/reminders", { credentials: "include" })
+    ]);
 
-return;
+    const pets = await petsRes.json();
+    const reminders = await remindersRes.json();
 
+    const container = document.getElementById("petCardsContainer");
+    container.innerHTML = "";
+
+    if (!pets.length) {
+      container.innerHTML =
+        "<p class='text-muted'>No pets yet. Add one!</p>";
+      return;
+    }
+
+    pets.forEach(pet => {
+
+      const petReminders = reminders.filter(r => r.pet._id === pet._id);
+
+      const nextReminder = petReminders
+        .filter(r => !r.completed)
+        .sort((a,b) => new Date(a.date) - new Date(b.date))[0];
+
+      const completedCount =
+        petReminders.filter(r => r.completed).length;
+
+      const col = document.createElement("div");
+      col.className = "col-md-6";
+
+      col.innerHTML = `
+        <div class="card shadow-sm dashboard-card p-4 h-100 pet-card"
+             style="cursor:pointer"
+             data-id="${pet._id}">
+
+          <h5 class="fw-bold">🐾 ${pet.name}</h5>
+
+          <ul class="text-muted small">
+
+            <li><strong>Breed:</strong> ${pet.breed}</li>
+
+            <li>
+              <strong>Next Reminder:</strong>
+              ${nextReminder
+                ? new Date(nextReminder.date).toLocaleString()
+                : "None"}
+            </li>
+
+            <li>
+              <strong>Completed Tasks:</strong>
+              ${completedCount}
+            </li>
+
+          </ul>
+
+          <button class="btn btn-primary w-100 mt-auto">
+            View Profile
+          </button>
+
+        </div>
+      `;
+
+      container.appendChild(col);
+    });
+
+    attachPetCardHandlers();
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-reminderContainer.innerHTML = "";
 
-reminders.slice(0,5).forEach(reminder => {
-
-const div = document.createElement("div");
-
-div.className = "mb-3 border-bottom pb-2";
-
-div.innerHTML = `
-<strong>🐾 ${reminder.pet.name}</strong>
-<div>${reminder.task}</div>
-<div class="small text-muted">
-${new Date(reminder.date).toLocaleString()}
-</div>
-`;
-
-reminderContainer.appendChild(div);
-
-});
-
-} catch {
-
-reminderContainer.innerHTML =
-"<p class='text-muted'>Error loading reminders</p>";
-
+// ================= CLICK HANDLER =================
+function attachPetCardHandlers() {
+  document.querySelectorAll(".pet-card").forEach(card => {
+    card.onclick = () => {
+      const id = card.dataset.id;
+      window.location.href = `/pet.html?petId=${id}`;
+    };
+  });
 }
 
-}
 
-// INIT
+// ================= INIT =================
 loadDashboardReminders();
+loadPetCards();
