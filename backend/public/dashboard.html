@@ -45,21 +45,25 @@
       </div>
     </div>
 
+    <!-- ✅ UPDATED STATS CARD -->
     <div class="col-md-6">
       <div class="card shadow-sm dashboard-card p-4 h-100">
+
         <h5 class="fw-bold">
           <i class="bi bi-graph-up me-2"></i>
           Pet Stats This Week
         </h5>
-        <ul class="text-muted small">
-          <li>Dynamic stats coming soon</li>
-        </ul>
+
+        <div id="petStatsContainer">
+          <p class="text-muted">Loading stats...</p>
+        </div>
+
       </div>
     </div>
 
   </div>
 
-  <!-- 🔥 DYNAMIC PET CARDS -->
+  <!-- PET CARDS (UNCHANGED) -->
   <div class="row g-4 mb-5" id="petCardsContainer"></div>
 
   <!-- REMINDERS -->

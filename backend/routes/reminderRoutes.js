@@ -173,4 +173,61 @@ router.delete("/:id", async (req, res) => {
 
 });
 
+// ================= GET WEEKLY STATS =================
+router.get("/stats/:petId", async (req, res) => {
+
+  try {
+
+    if (!req.session.userId) {
+      return res.status(401).send({ error: "Not logged in" });
+    }
+
+    const petId = req.params.petId;
+
+    // ===== GET START OF WEEK =====
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0,0,0,0);
+
+    // ===== GET END OF WEEK =====
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+    const reminders = await Reminder.find({
+      owner: req.session.userId,
+      pet: petId,
+      completed: true,
+      date: { $gte: startOfWeek, $lt: endOfWeek }
+    });
+
+    // ===== COUNT STATS =====
+    let stats = {
+      walk: 0,
+      feeding: 0,
+      medication: 0,
+      bath: 0,
+      other: 0
+    };
+
+    reminders.forEach(r => {
+
+      const task = r.task.toLowerCase();
+
+      if (task.includes("walk")) stats.walk++;
+      else if (task.includes("feed") || task.includes("food")) stats.feeding++;
+      else if (task.includes("med")) stats.medication++;
+      else if (task.includes("bath")) stats.bath++;
+      else stats.other++;
+
+    });
+
+    res.send(stats);
+
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+
+});
+
 module.exports = router;
