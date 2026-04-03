@@ -202,6 +202,29 @@ function attachPetCardHandlers() {
 }
 
 
+const input = document.getElementById("AIChatInput");
+const sendBtn = document.getElementById("AIChatSendBtn");
+const count = document.getElementById("chatCharCount");
+const chips = document.querySelectorAll(".ai-chip");
+
+input.addEventListener("input", () => {
+  count.textContent = input.value.length;
+});
+
+chips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    input.value = chip.textContent;
+    count.textContent = input.value.length;
+    input.focus();
+  });
+});
+
+input.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    sendBtn.click();
+  }
+});
+
 // ================= INIT =================
 loadDashboardReminders();
 loadPetCards();
