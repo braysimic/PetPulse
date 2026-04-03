@@ -1,4 +1,13 @@
+// ================= ELEMENTS =================
 const reminderContainer = document.getElementById("dashboardReminders");
+const petCardsContainer = document.getElementById("petCardsContainer");
+const petStatsContainer = document.getElementById("petStatsContainer");
+
+const input = document.getElementById("AIChatInput");
+const sendBtn = document.getElementById("AIChatSendBtn");
+const count = document.getElementById("chatCharCount");
+const chips = document.querySelectorAll(".ai-chip");
+const chatContainer = document.getElementById("AIChatResponse");
 
 
 // ================= LOAD REMINDERS =================
@@ -62,11 +71,10 @@ async function loadPetCards() {
     const pets = await petsRes.json();
     const reminders = await remindersRes.json();
 
-    const container = document.getElementById("petCardsContainer");
-    container.innerHTML = "";
+    petCardsContainer.innerHTML = "";
 
     if (!pets.length) {
-      container.innerHTML =
+      petCardsContainer.innerHTML =
         "<p class='text-muted'>No pets yet. Add one!</p>";
       return;
     }
@@ -115,7 +123,7 @@ async function loadPetCards() {
         </div>
       `;
 
-      container.appendChild(col);
+      petCardsContainer.appendChild(col);
     });
 
     attachPetCardHandlers();
@@ -136,11 +144,10 @@ async function loadPetStats() {
 
     const pets = await petsRes.json();
 
-    const container = document.getElementById("petStatsContainer");
-    container.innerHTML = "";
+    petStatsContainer.innerHTML = "";
 
     if (!pets.length) {
-      container.innerHTML =
+      petStatsContainer.innerHTML =
         "<p class='text-muted'>No pets yet</p>";
       return;
     }
@@ -181,17 +188,17 @@ async function loadPetStats() {
         </div>
       `;
 
-      container.appendChild(div);
+      petStatsContainer.appendChild(div);
     }
 
   } catch {
-    document.getElementById("petStatsContainer").innerHTML =
+    petStatsContainer.innerHTML =
       "<p class='text-muted'>Error loading stats</p>";
   }
 }
 
 
-// ================= CLICK HANDLER =================
+// ================= PET CARD CLICK =================
 function attachPetCardHandlers() {
   document.querySelectorAll(".pet-card").forEach(card => {
     card.onclick = () => {
@@ -202,15 +209,14 @@ function attachPetCardHandlers() {
 }
 
 
-const input = document.getElementById("AIChatInput");
-const sendBtn = document.getElementById("AIChatSendBtn");
-const count = document.getElementById("chatCharCount");
-const chips = document.querySelectorAll(".ai-chip");
+// ================= AI CHAT =================
 
-input.addEventListener("input", () => {
+// Character counter
+input?.addEventListener("input", () => {
   count.textContent = input.value.length;
 });
 
+// Chips autofill
 chips.forEach(chip => {
   chip.addEventListener("click", () => {
     input.value = chip.textContent;
@@ -219,11 +225,66 @@ chips.forEach(chip => {
   });
 });
 
-input.addEventListener("keypress", (e) => {
+// Enter key
+input?.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendBtn.click();
   }
 });
+
+// Send message
+sendBtn?.addEventListener("click", async () => {
+
+  const message = input.value.trim();
+  if (!message) return;
+
+  // USER MESSAGE
+  const userMsg = document.createElement("div");
+  userMsg.className = "ai-message ai-message-user";
+  userMsg.innerHTML = `<div class="ai-bubble">${message}</div>`;
+  chatContainer.appendChild(userMsg);
+
+  input.value = "";
+  count.textContent = "0";
+
+  try {
+
+    const res = await fetch("/api/ai/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+
+    // BOT RESPONSE
+    const botMsg = document.createElement("div");
+    botMsg.className = "ai-message ai-message-bot";
+
+    botMsg.innerHTML = `
+      <div class="ai-avatar">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="ai-bubble">
+        ${data.reply}
+      </div>
+    `;
+
+    chatContainer.appendChild(botMsg);
+
+    // AUTO SCROLL
+    const chatBox = document.getElementById("aiChatContainer");
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+  } catch {
+    console.log("AI error");
+  }
+
+});
+
 
 // ================= INIT =================
 loadDashboardReminders();
