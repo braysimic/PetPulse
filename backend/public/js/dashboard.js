@@ -2,6 +2,7 @@
 const reminderContainer = document.getElementById("dashboardReminders");
 const petCardsContainer = document.getElementById("petCardsContainer");
 const petStatsContainer = document.getElementById("petStatsContainer");
+const vetContainer = document.getElementById("vetContactContainer");
 
 const input = document.getElementById("AIChatInput");
 const sendBtn = document.getElementById("AIChatSendBtn");
@@ -198,6 +199,131 @@ async function loadPetStats() {
 }
 
 
+// ================= LOAD VET CONTACT =================
+async function loadVetContact() {
+
+  try {
+
+    const res = await fetch("/api/vet", {
+      credentials: "include"
+    });
+
+    const data = await res.json();
+
+    vetContainer.innerHTML = `
+  <div class="mb-3">
+
+    <h6 class="fw-bold">Primary Vet</h6>
+
+    <input id="primaryClinic" class="form-control mb-1"
+      placeholder="Clinic Name"
+      value="${data.primary?.clinicName || ""}" />
+
+    <input id="primaryVet" class="form-control mb-1"
+      placeholder="Vet Name"
+      value="${data.primary?.vetName || ""}" />
+
+    <div class="input-group mb-2">
+      <input id="primaryPhone" class="form-control"
+        placeholder="Phone"
+        value="${data.primary?.phone || ""}" />
+
+      <a
+        href="tel:${data.primary?.phone || ""}"
+        class="btn btn-outline-success"
+      >
+        📞 Call
+      </a>
+    </div>
+
+  </div>
+
+
+  <div class="mb-3">
+
+    <h6 class="fw-bold text-danger">🚨 Emergency Clinic</h6>
+
+    <input id="emergencyClinic" class="form-control mb-1"
+      placeholder="Clinic Name"
+      value="${data.emergency?.clinicName || ""}" />
+
+    <div class="input-group mb-1">
+      <input id="emergencyPhone" class="form-control"
+        placeholder="Phone"
+        value="${data.emergency?.phone || ""}" />
+
+      <a
+        href="tel:${data.emergency?.phone || ""}"
+        class="btn btn-danger"
+      >
+        📞 Call
+      </a>
+    </div>
+
+    <div class="input-group mb-2">
+      <input id="emergencyAddress" class="form-control"
+        placeholder="Address"
+        value="${data.emergency?.address || ""}" />
+
+      <a
+        href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.emergency?.address || "")}"
+        target="_blank"
+        class="btn btn-outline-primary"
+      >
+        📍 Maps
+      </a>
+    </div>
+
+  </div>
+
+  <button class="btn btn-primary w-100" id="saveVetBtn">
+    Save Contact Info
+  </button>
+`;
+
+    attachVetSaveHandler();
+
+  } catch {
+    vetContainer.innerHTML =
+      "<p class='text-danger'>Failed to load vet info</p>";
+  }
+}
+
+
+// ================= SAVE VET =================
+function attachVetSaveHandler() {
+
+  document.getElementById("saveVetBtn").onclick = async () => {
+
+    const body = {
+      primary: {
+        clinicName: primaryClinic.value,
+        vetName: primaryVet.value,
+        phone: primaryPhone.value
+      },
+      emergency: {
+        clinicName: emergencyClinic.value,
+        phone: emergencyPhone.value,
+        address: emergencyAddress.value
+      }
+    };
+
+    const res = await fetch("/api/vet", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      alert("Saved successfully!");
+    }
+  };
+}
+
+
 // ================= PET CARD CLICK =================
 function attachPetCardHandlers() {
   document.querySelectorAll(".pet-card").forEach(card => {
@@ -210,13 +336,10 @@ function attachPetCardHandlers() {
 
 
 // ================= AI CHAT =================
-
-// Character counter
 input?.addEventListener("input", () => {
   count.textContent = input.value.length;
 });
 
-// Chips autofill
 chips.forEach(chip => {
   chip.addEventListener("click", () => {
     input.value = chip.textContent;
@@ -225,20 +348,17 @@ chips.forEach(chip => {
   });
 });
 
-// Enter key
 input?.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendBtn.click();
   }
 });
 
-// Send message
 sendBtn?.addEventListener("click", async () => {
 
   const message = input.value.trim();
   if (!message) return;
 
-  // USER MESSAGE
   const userMsg = document.createElement("div");
   userMsg.className = "ai-message ai-message-user";
   userMsg.innerHTML = `<div class="ai-bubble">${message}</div>`;
@@ -260,7 +380,6 @@ sendBtn?.addEventListener("click", async () => {
 
     const data = await res.json();
 
-    // BOT RESPONSE
     const botMsg = document.createElement("div");
     botMsg.className = "ai-message ai-message-bot";
 
@@ -275,7 +394,6 @@ sendBtn?.addEventListener("click", async () => {
 
     chatContainer.appendChild(botMsg);
 
-    // AUTO SCROLL
     const chatBox = document.getElementById("aiChatContainer");
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -290,3 +408,4 @@ sendBtn?.addEventListener("click", async () => {
 loadDashboardReminders();
 loadPetCards();
 loadPetStats();
+loadVetContact();
