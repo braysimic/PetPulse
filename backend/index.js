@@ -15,6 +15,8 @@ const petRoutes = require("./routes/petRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
 const medicalRoutes = require("./routes/medicalRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const vetRoutes = require("./routes/vetRoutes");
+
 
 
 
@@ -73,6 +75,7 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/medical", medicalRoutes);
 app.use("/uploads", express.static("public/uploads"));
 app.use("/api/ai", aiRoutes);
+app.use("/api/vet", vetRoutes);
 
 
 // ===== Start server =====
