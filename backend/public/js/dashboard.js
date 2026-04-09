@@ -74,11 +74,13 @@ async function loadPetCards() {
 
     petCardsContainer.innerHTML = "";
 
+    /*
     if (!pets.length) {
       petCardsContainer.innerHTML =
         "<p class='text-muted'>No pets yet. Add one!</p>";
       return;
     }
+      */
 
     pets.forEach(pet => {
 
@@ -149,7 +151,7 @@ async function loadPetStats() {
 
     if (!pets.length) {
       petStatsContainer.innerHTML =
-        "<p class='text-muted'>No pets yet</p>";
+        "<p class='text-muted'>No pets yet. Add one!</p>";
       return;
     }
 
@@ -254,7 +256,7 @@ async function loadVetContact() {
 
       <a
         href="tel:${data.emergency?.phone || ""}"
-        class="btn btn-danger"
+        class="btn btn-outline-danger"
       >
         📞 Call
       </a>
@@ -355,20 +357,52 @@ input?.addEventListener("keypress", (e) => {
 });
 
 sendBtn?.addEventListener("click", async () => {
-
   const message = input.value.trim();
   if (!message) return;
 
+  const chatBox = document.getElementById("aiChatContainer");
+
+  // Add user message
   const userMsg = document.createElement("div");
   userMsg.className = "ai-message ai-message-user";
-  userMsg.innerHTML = `<div class="ai-bubble">${message}</div>`;
+  userMsg.innerHTML = `
+    <div class="ai-bubble">
+      ${message}
+      <div class="ai-message-time">Just now</div>
+    </div>
+  `;
   chatContainer.appendChild(userMsg);
 
+  // Clear input
   input.value = "";
   count.textContent = "0";
 
-  try {
+  // Disable input while waiting
+  sendBtn.disabled = true;
+  input.disabled = true;
 
+  // Add typing indicator
+  const typingMsg = document.createElement("div");
+  typingMsg.className = "ai-message ai-message-bot ai-typing";
+  typingMsg.id = "aiTypingIndicator";
+  typingMsg.innerHTML = `
+    <div class="ai-avatar">
+      <i class="bi bi-robot"></i>
+    </div>
+    <div class="ai-bubble">
+      <div class="ai-typing-dots" aria-label="Assistant is typing">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  `;
+  chatContainer.appendChild(typingMsg);
+
+  // Scroll to bottom
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  try {
     const res = await fetch("/api/ai/chat", {
       method: "POST",
       headers: {
@@ -380,27 +414,48 @@ sendBtn?.addEventListener("click", async () => {
 
     const data = await res.json();
 
+    // Remove typing indicator
+    typingMsg.remove();
+
+    // Add bot response
     const botMsg = document.createElement("div");
     botMsg.className = "ai-message ai-message-bot";
-
     botMsg.innerHTML = `
       <div class="ai-avatar">
         <i class="bi bi-robot"></i>
       </div>
       <div class="ai-bubble">
         ${data.reply}
+        <div class="ai-message-time">Just now</div>
       </div>
     `;
 
     chatContainer.appendChild(botMsg);
-
-    const chatBox = document.getElementById("aiChatContainer");
     chatBox.scrollTop = chatBox.scrollHeight;
 
-  } catch {
-    console.log("AI error");
-  }
+  } catch (err) {
+    console.error("AI error:", err);
 
+    typingMsg.remove();
+
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "ai-message ai-message-bot";
+    errorMsg.innerHTML = `
+      <div class="ai-avatar">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="ai-bubble">
+        Sorry, I ran into an error getting a response. Please try again.
+      </div>
+    `;
+
+    chatContainer.appendChild(errorMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } finally {
+    sendBtn.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
 });
 
 
