@@ -145,5 +145,112 @@ deleteBtn.addEventListener("click", async () => {
 });
 
 
+// ================= LOAD MEDICAL RECORDS =================
+async function loadMedicalRecords() {
+
+  const container = document.getElementById("medicalList");
+
+  try {
+
+    const res = await fetch(`/api/medical/${petId}`, {
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      container.innerHTML =
+        "<p class='text-muted'>Failed to load records</p>";
+      return;
+    }
+
+    const records = await res.json();
+
+    if (!records.length) {
+      container.innerHTML =
+        "<p class='text-muted'>No records yet</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    records.forEach(record => {
+
+      const div = document.createElement("div");
+      div.className = "mb-3 border-bottom pb-2";
+
+      div.innerHTML = `
+        <strong>${record.type}</strong>
+        <div>${record.description}</div>
+        <div class="small text-muted">
+          ${new Date(record.date).toLocaleDateString()}
+        </div>
+        ${record.fileUrl
+          ? `<a href="${record.fileUrl}" target="_blank">View File</a>`
+          : ""}
+      `;
+
+      container.appendChild(div);
+    });
+
+  } catch {
+    container.innerHTML =
+      "<p class='text-muted'>Error loading records</p>";
+  }
+
+}
+
+
+// ================= LOAD REMINDERS =================
+async function loadReminders() {
+
+  try {
+
+    const res = await fetch("/api/reminders", {
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      reminderList.innerHTML =
+        "<p class='text-muted'>Failed to load reminders</p>";
+      return;
+    }
+
+    const reminders = await res.json();
+
+    const petReminders = reminders.filter(r => r.pet._id === petId);
+
+    if (!petReminders.length) {
+      reminderList.innerHTML =
+        "<p class='text-muted'>No reminders yet</p>";
+      return;
+    }
+
+    reminderList.innerHTML = "";
+
+    petReminders.forEach(reminder => {
+
+      const div = document.createElement("div");
+
+      div.className = "mb-3 border-bottom pb-2";
+
+      div.innerHTML = `
+        <strong>${reminder.task}</strong>
+        <div class="small text-muted">
+          ${new Date(reminder.date).toLocaleString()}
+        </div>
+      `;
+
+      reminderList.appendChild(div);
+    });
+
+  } catch {
+    reminderList.innerHTML =
+      "<p class='text-muted'>Error loading reminders</p>";
+  }
+
+}
+
+
 // ================= INIT =================
 loadPet();
+loadMedicalRecords();
+loadReminders();
