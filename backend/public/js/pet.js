@@ -8,6 +8,9 @@ const deleteBtn = document.getElementById("deletePetBtn");
 const reminderForm = document.getElementById("reminderForm");
 const reminderList = document.getElementById("reminderList");
 
+const petImage = document.getElementById("petImage");
+const petPicture = document.getElementById("petPicture");
+
 // ===== VIEW MODE =====
 const petView = document.getElementById("petView");
 const editBtn = document.getElementById("editBtn");
@@ -42,10 +45,39 @@ async function loadPet() {
     viewSpecies.innerText = pet.species;
     viewBreed.innerText = pet.breed;
 
+    // IMAGE
+    petImage.src = pet.image && pet.image.length > 0
+      ? pet.image
+      : "https://cdn-icons-png.flaticon.com/512/616/616408.png";
+
   } catch {
     window.location.href = "/dashboard.html";
   }
 }
+
+
+// ================= IMAGE UPLOAD =================
+petPicture?.addEventListener("change", async () => {
+
+  if (!petPicture.files.length) return;
+
+  const formData = new FormData();
+  formData.append("image", petPicture.files[0]);
+
+  const res = await fetch(`/api/pets/${petId}/image`, {
+    method: "POST",
+    credentials: "include",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    petImage.src = data.image;
+  } else {
+    alert("Upload failed");
+  }
+});
 
 
 // ================= TOGGLE EDIT =================
@@ -88,12 +120,10 @@ form.addEventListener("submit", async (e) => {
   message.innerHTML =
     `<div class="alert alert-success">Pet updated successfully</div>`;
 
-  // UPDATE VIEW MODE
   viewName.innerText = petName.value;
   viewSpecies.innerText = petSpecies.value;
   viewBreed.innerText = petBreed.value;
 
-  // SWITCH BACK
   form.classList.add("d-none");
   petView.classList.remove("d-none");
 });
@@ -115,303 +145,5 @@ deleteBtn.addEventListener("click", async () => {
 });
 
 
-// ================= LOAD REMINDERS =================
-async function loadReminders() {
-
-  const res = await fetch("/api/reminders", {
-    credentials: "include"
-  });
-
-  const reminders = await res.json();
-
-  const petReminders = reminders.filter(
-    r => r.pet._id === petId
-  );
-
-  reminderList.innerHTML = "";
-
-  if (!petReminders.length) {
-    reminderList.innerHTML =
-      "<p class='text-muted'>No reminders yet</p>";
-    return;
-  }
-
-  petReminders.forEach(reminder => {
-
-    const div = document.createElement("div");
-
-    div.className =
-      "d-flex justify-content-between align-items-center mb-2 border p-2 rounded";
-
-    div.innerHTML = `
-      <div>
-        <input
-          type="checkbox"
-          ${reminder.completed ? "checked" : ""}
-          class="completeReminder"
-          data-id="${reminder._id}"
-        />
-
-        <strong class="${
-          reminder.completed ? "text-decoration-line-through text-muted" : ""
-        }">
-          ${reminder.task}
-        </strong>
-
-        <div class="small text-muted">
-          ${new Date(reminder.date).toLocaleString()}
-        </div>
-      </div>
-
-      <button
-        class="btn btn-sm btn-outline-danger deleteReminder"
-        data-id="${reminder._id}">
-        🗑
-      </button>
-    `;
-
-    reminderList.appendChild(div);
-  });
-
-  attachReminderHandlers();
-}
-
-
-// ================= CREATE REMINDER =================
-reminderForm?.addEventListener("submit", async (e) => {
-
-  e.preventDefault();
-
-  const body = {
-    petId,
-    task: reminderTask.value,
-    date: reminderDate.value,
-    repeat: reminderRepeat.value
-  };
-
-  const res = await fetch("/api/reminders", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(body)
-  });
-
-  if (res.ok) {
-    reminderForm.reset();
-    loadReminders();
-  }
-});
-
-
-// ================= REMINDER HANDLERS =================
-function attachReminderHandlers() {
-
-  document.querySelectorAll(".completeReminder").forEach(box => {
-    box.onclick = async () => {
-
-      await fetch(`/api/reminders/${box.dataset.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          completed: box.checked
-        })
-      });
-
-      loadReminders();
-    };
-  });
-
-  document.querySelectorAll(".deleteReminder").forEach(btn => {
-    btn.onclick = async () => {
-
-      if (!confirm("Delete this reminder?")) return;
-
-      await fetch(`/api/reminders/${btn.dataset.id}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
-
-      loadReminders();
-    };
-  });
-}
-
-
-// ================= MEDICAL RECORDS =================
-const medicalForm = document.getElementById("medicalForm");
-const medicalList = document.getElementById("medicalList");
-
-let editingRecordId = null;
-let allRecords = [];
-
-function formatDate(dateString) {
-  const d = new Date(dateString);
-  const fixed = new Date(d.getTime() + d.getTimezoneOffset() * 60000);
-  return fixed.toLocaleDateString();
-}
-
-
-// LOAD
-async function loadMedicalRecords() {
-  const res = await fetch(`/api/medical/${petId}`, {
-    credentials: "include"
-  });
-
-  allRecords = await res.json();
-  renderMedicalRecords(allRecords);
-}
-
-
-// RENDER
-function renderMedicalRecords(records) {
-
-  medicalList.innerHTML = "";
-
-  if (!records.length) {
-    medicalList.innerHTML =
-      "<p class='text-muted'>No records found</p>";
-    return;
-  }
-
-  records.forEach(r => {
-
-    const div = document.createElement("div");
-
-    div.className =
-      "border p-2 rounded mb-2 d-flex justify-content-between align-items-center";
-
-    div.innerHTML = `
-      <div>
-        <strong>${r.type.toUpperCase()}</strong>
-        <div>${r.description}</div>
-        <div class="small text-muted">${formatDate(r.date)}</div>
-        ${
-          r.fileUrl
-            ? `<a href="${r.fileUrl}" target="_blank">View File</a>`
-            : ""
-        }
-      </div>
-
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-secondary editRecord" data-id="${r._id}">
-          ✏️
-        </button>
-
-        <button class="btn btn-sm btn-outline-danger deleteRecord" data-id="${r._id}">
-          🗑
-        </button>
-      </div>
-    `;
-
-    medicalList.appendChild(div);
-  });
-
-  attachMedicalHandlers();
-}
-
-
-// CREATE / UPDATE
-medicalForm?.addEventListener("submit", async (e) => {
-
-  e.preventDefault();
-
-  const formData = new FormData();
-
-  formData.append("petId", petId);
-  formData.append("type", medicalType.value);
-  formData.append("date", medicalDate.value);
-  formData.append("description", medicalDescription.value);
-
-  if (medicalFile.files[0]) {
-    formData.append("file", medicalFile.files[0]);
-  }
-
-  let url = "/api/medical";
-  let method = "POST";
-
-  if (editingRecordId) {
-    url = `/api/medical/${editingRecordId}`;
-    method = "PUT";
-  }
-
-  const res = await fetch(url, {
-    method,
-    credentials: "include",
-    body: formData
-  });
-
-  if (res.ok) {
-    medicalForm.reset();
-    editingRecordId = null;
-    medicalForm.querySelector("button").innerText = "Save Record";
-    loadMedicalRecords();
-  }
-});
-
-
-// HANDLERS
-function attachMedicalHandlers() {
-
-  document.querySelectorAll(".deleteRecord").forEach(btn => {
-    btn.onclick = async () => {
-
-      if (!confirm("Delete this record?")) return;
-
-      await fetch(`/api/medical/${btn.dataset.id}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
-
-      loadMedicalRecords();
-    };
-  });
-
-  document.querySelectorAll(".editRecord").forEach(btn => {
-    btn.onclick = () => {
-
-      const record = allRecords.find(r => r._id === btn.dataset.id);
-
-      medicalType.value = record.type;
-      medicalDescription.value = record.description;
-      medicalDate.value = record.date.split("T")[0];
-
-      editingRecordId = record._id;
-
-      medicalForm.querySelector("button").innerText = "Update Record";
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-  });
-}
-
-
-// SEARCH
-document.getElementById("searchKeyword")?.addEventListener("input", filterRecords);
-document.getElementById("searchDate")?.addEventListener("input", filterRecords);
-
-function filterRecords() {
-
-  const keyword = searchKeyword.value.toLowerCase();
-  const date = searchDate.value;
-
-  const filtered = allRecords.filter(r => {
-
-    const matchKeyword =
-      r.description.toLowerCase().includes(keyword) ||
-      r.type.toLowerCase().includes(keyword);
-
-    const matchDate =
-      !date || r.date.startsWith(date);
-
-    return matchKeyword && matchDate;
-  });
-
-  renderMedicalRecords(filtered);
-}
-
-
 // ================= INIT =================
 loadPet();
-loadReminders();
-loadMedicalRecords();

@@ -15,7 +15,7 @@
 
 <body>
 
-  <div id="navbarContainer"></div>
+<div id="navbarContainer"></div>
 
 <div class="container py-5">
 
@@ -29,33 +29,33 @@
 
 <div class="card shadow-sm p-4">
 
-<!-- PET IMAGE -->
+<!-- ================= PET IMAGE ================= -->
 <div class="text-center mb-4">
 
-<img
-id="petImage"
-src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
-class="rounded-circle mb-3"
-width="130"
-height="130"
-style="object-fit:cover;border:3px solid #eee"
-/>
+  <img
+    id="petImage"
+    src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
+    class="rounded-circle mb-3"
+    width="130"
+    height="130"
+    style="object-fit:cover;border:3px solid #eee"
+  />
 
-<input
-type="file"
-id="petPicture"
-class="form-control"
-accept="image/*"
-/>
+  <input
+    type="file"
+    id="petPicture"
+    class="form-control"
+    accept="image/*"
+  />
 
-<small class="text-muted">
-Profile picture upload (UI only for now)
-</small>
+  <small class="text-muted">
+    Upload a profile picture
+  </small>
 
 </div>
 
 
-<!-- TABS -->
+<!-- ================= TABS ================= -->
 <ul class="nav nav-tabs mb-4">
 
 <li class="nav-item">
@@ -145,8 +145,8 @@ data-bs-target="#remindersTab">
 
   </form>
 
-  <!-- DELETE BUTTON (unchanged) -->
-  <button id="deletePetBtn" class="btn btn-important w-100 mt-3">
+  <!-- DELETE -->
+  <button id="deletePetBtn" class="btn btn-danger w-100 mt-3">
     Delete Pet
   </button>
 
@@ -160,7 +160,6 @@ data-bs-target="#remindersTab">
 
   <h5 class="fw-bold mb-3">Medical Records</h5>
   
-  <!-- ===== Upload Form ===== -->
   <form id="medicalForm" class="mb-4">
   
   <select id="medicalType" class="form-select mb-2" required>
@@ -171,27 +170,11 @@ data-bs-target="#remindersTab">
   <option value="document">Document</option>
   </select>
   
-  <input
-  type="date"
-  id="medicalDate"
-  class="form-control mb-2"
-  required
-  />
+  <input type="date" id="medicalDate" class="form-control mb-2" required />
   
-  <input
-  type="text"
-  id="medicalDescription"
-  class="form-control mb-2"
-  placeholder="Description"
-  required
-  />
+  <input type="text" id="medicalDescription" class="form-control mb-2" placeholder="Description" required />
   
-  <input
-  type="file"
-  id="medicalFile"
-  class="form-control mb-3"
-  accept=".jpg,.png,.pdf"
-  />
+  <input type="file" id="medicalFile" class="form-control mb-3" accept=".jpg,.png,.pdf" />
   
   <button class="btn btn-primary w-100">
   Save Record
@@ -199,27 +182,16 @@ data-bs-target="#remindersTab">
   
   </form>
   
-  <!-- ===== Search ===== -->
   <div class="mb-3">
-  <input
-  id="searchKeyword"
-  class="form-control mb-2"
-  placeholder="Search by keyword"
-  />
-  
-  <input
-  type="date"
-  id="searchDate"
-  class="form-control"
-  />
+  <input id="searchKeyword" class="form-control mb-2" placeholder="Search by keyword" />
+  <input type="date" id="searchDate" class="form-control" />
   </div>
   
-  <!-- ===== Records List ===== -->
   <div id="medicalList">
   <p class="text-muted">Loading records...</p>
   </div>
   
-  </div>
+</div>
 
 
 <!-- ================= REMINDERS ================= -->
@@ -229,19 +201,9 @@ data-bs-target="#remindersTab">
 
 <form id="reminderForm" class="mb-4">
 
-  <input
-  id="reminderTask"
-  class="form-control mb-2"
-  placeholder="Task (ex: Give medication)"
-  required
-  />
+  <input id="reminderTask" class="form-control mb-2" placeholder="Task (ex: Give medication)" required />
   
-  <input
-  id="reminderDate"
-  type="datetime-local"
-  class="form-control mb-2"
-  required
-  />
+  <input id="reminderDate" type="datetime-local" class="form-control mb-2" required />
   
   <select id="reminderRepeat" class="form-select mb-2">
   <option value="none">Does not repeat</option>
@@ -254,7 +216,7 @@ data-bs-target="#remindersTab">
   Add Reminder
   </button>
   
-  </form>
+</form>
 
 <div id="reminderList">
 <p class="text-muted">Loading reminders...</p>
@@ -268,7 +230,6 @@ data-bs-target="#remindersTab">
 </div>
 </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/navbar.js"></script>
