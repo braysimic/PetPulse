@@ -1,6 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const Pet = require("../models/Pet");
+const multer = require("multer");
+
+
+// ================= MULTER SETUP =================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
 
 
 // ================= GET ALL PETS =================
@@ -135,6 +149,41 @@ router.delete("/:id", async (req, res) => {
     }
 
     res.send({ message: "Pet deleted" });
+
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+
+});
+
+
+// ================= UPLOAD PET IMAGE =================
+router.post("/:id/image", upload.single("image"), async (req, res) => {
+
+  try {
+
+    if (!req.session.userId) {
+      return res.status(401).send({ error: "Not logged in" });
+    }
+
+    const pet = await Pet.findOne({
+      _id: req.params.id,
+      owner: req.session.userId
+    });
+
+    if (!pet) {
+      return res.status(404).send({ error: "Pet not found" });
+    }
+
+    if (req.file) {
+      pet.image = `/uploads/${req.file.filename}`;
+      await pet.save();
+    }
+
+    res.send({
+      message: "Image uploaded",
+      image: pet.image
+    });
 
   } catch (err) {
     res.status(500).send({ error: err.message });
